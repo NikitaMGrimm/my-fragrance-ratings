@@ -1,0 +1,5 @@
+{
+  "name": "My Perfume Collection",
+  "description": "A dark-themed perfume collection viewer inspired by Parfumo, featuring sorting and ratings.",
+  "requestFramePermissions": []
+}
