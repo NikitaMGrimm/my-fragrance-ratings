@@ -22,7 +22,7 @@ const CachedImage: React.FC<CachedImageProps> = ({ src, alt, pid, className }) =
       if (pid && pid !== '0') {
         for (const ext of EXTENSIONS) {
             try {
-                const localPath = `./images/${pid}.${ext}`;
+            const localPath = `${import.meta.env.BASE_URL}images/${pid}.${ext}`;
                 const response = await fetch(localPath);
                 
                 const contentType = response.headers.get('content-type');

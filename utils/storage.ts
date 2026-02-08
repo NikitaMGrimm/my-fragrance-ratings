@@ -20,7 +20,7 @@ export const loadPerfumesFromStorage = (): Perfume[] | null => {
 
 export const fetchDefaultCSV = async (): Promise<Perfume[]> => {
   try {
-    const response = await fetch('./constants.csv');
+    const response = await fetch(`${import.meta.env.BASE_URL}constants.csv`);
     if (!response.ok) {
         throw new Error("CSV file not found");
     }

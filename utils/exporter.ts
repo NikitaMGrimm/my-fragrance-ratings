@@ -29,7 +29,7 @@ export const exportCollection = async (perfumes: Perfume[]) => {
               const extensions = ['jpg', 'jpeg', 'png', 'webp'];
               for (const e of extensions) {
                   try {
-                      const resp = await fetch(`./images/${p.pid}.${e}`);
+                    const resp = await fetch(`${import.meta.env.BASE_URL}images/${p.pid}.${e}`);
                       const contentType = resp.headers.get('content-type');
                       if (resp.ok && contentType && contentType.startsWith('image')) {
                           blob = await resp.blob();
