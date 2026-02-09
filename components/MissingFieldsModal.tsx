@@ -67,11 +67,13 @@ const toEntryLabel = (value: unknown) => {
 };
 
 const MissingFieldsModal: React.FC<MissingFieldsModalProps> = ({ isOpen, onClose, perfumes, onSave }) => {
+  const [activeTab, setActiveTab] = useState<'missing' | 'entries'>('missing');
   const [selectedField, setSelectedField] = useState<string>('');
   const [overrides, setOverrides] = useState<Record<string, Record<string, string>>>({});
   const [entryField, setEntryField] = useState<string>('');
   const [selectedEntry, setSelectedEntry] = useState<string>('');
-  const [bulkValue, setBulkValue] = useState<string>('');
+  const [bulkTargetField, setBulkTargetField] = useState<string>('');
+  const [bulkTargetValue, setBulkTargetValue] = useState<string>('');
 
   const availableFields = useMemo(() => {
     const allKeys = new Set<string>();
@@ -163,17 +165,18 @@ const MissingFieldsModal: React.FC<MissingFieldsModalProps> = ({ isOpen, onClose
   const handleEntryFieldChange = (value: string) => {
     setEntryField(value);
     setSelectedEntry('');
-    setBulkValue('');
+    setBulkTargetField(value);
+    setBulkTargetValue('');
   };
 
   const handleSelectEntry = (entryKey: string) => {
     setSelectedEntry(entryKey);
-    setBulkValue('');
+    setBulkTargetValue('');
   };
 
-  const handleApplyBulk = () => {
-    if (!entryField || !selectedEntry) return;
-    const trimmed = bulkValue.trim();
+  const handleApplyTargetBulk = () => {
+    if (!entryField || !selectedEntry || !bulkTargetField) return;
+    const trimmed = bulkTargetValue.trim();
     if (trimmed === '') return;
 
     setOverrides((prev) => {
@@ -182,7 +185,7 @@ const MissingFieldsModal: React.FC<MissingFieldsModalProps> = ({ isOpen, onClose
         const perfumeId = getPerfumeId(perfume);
         next[perfumeId] = {
           ...(next[perfumeId] || {}),
-          [entryField]: bulkValue
+          [bulkTargetField]: bulkTargetValue
         };
       });
       return next;
@@ -197,9 +200,9 @@ const MissingFieldsModal: React.FC<MissingFieldsModalProps> = ({ isOpen, onClose
         <div className="flex justify-between items-center px-6 py-4 bg-parfumo-bg border-b border-gray-700 shrink-0">
           <div>
             <h2 className="text-lg font-bold text-parfumo-text flex items-center gap-2">
-              <AlertTriangle size={18} className="text-red-400" /> Missing Fields Checker
+              <AlertTriangle size={18} className="text-red-400" /> Field Fixer
             </h2>
-            <p className="text-xs text-gray-500">Fill in any missing CSV fields. Perfumes disappear once complete.</p>
+            <p className="text-xs text-gray-500">Review missing values or update field entries across your collection.</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
             <X size={20} />
@@ -208,28 +211,115 @@ const MissingFieldsModal: React.FC<MissingFieldsModalProps> = ({ isOpen, onClose
 
         <div className="p-6 space-y-6 overflow-y-auto">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-            <div className="w-full md:w-1/3">
-              <label className="block text-xs uppercase tracking-wider text-gray-500 mb-2">Filter by Field</label>
-              <select
-                value={selectedField}
-                onChange={(e) => setSelectedField(e.target.value)}
-                className="w-full bg-parfumo-card text-parfumo-text border border-gray-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-parfumo-accent cursor-pointer"
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveTab('missing')}
+                className={`px-3 py-1 rounded border text-xs uppercase tracking-wider transition-colors ${
+                  activeTab === 'missing'
+                    ? 'border-parfumo-accent bg-parfumo-highlight/40 text-parfumo-text'
+                    : 'border-gray-700 bg-black/20 text-gray-400 hover:border-gray-500'
+                }`}
               >
-                <option value="">All Missing Fields</option>
-                {availableFields.map((field) => (
-                  <option key={field} value={field}>
-                    {FIELD_LABELS[field] || field}
-                  </option>
-                ))}
-              </select>
+                Missing Fields
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('entries')}
+                className={`px-3 py-1 rounded border text-xs uppercase tracking-wider transition-colors ${
+                  activeTab === 'entries'
+                    ? 'border-parfumo-accent bg-parfumo-highlight/40 text-parfumo-text'
+                    : 'border-gray-700 bg-black/20 text-gray-400 hover:border-gray-500'
+                }`}
+              >
+                Field Entries
+              </button>
             </div>
-
-            <div className="text-xs text-gray-500 uppercase font-semibold tracking-wider">
-              {perfumesWithMissing.length} perfumes need attention
-            </div>
+            {activeTab === 'missing' && (
+              <div className="text-xs text-gray-500 uppercase font-semibold tracking-wider">
+                {perfumesWithMissing.length} perfumes need attention
+              </div>
+            )}
           </div>
 
-          <div className="bg-parfumo-card/60 border border-gray-700 rounded-lg p-4 space-y-4">
+          {activeTab === 'missing' && (
+            <div className="space-y-6">
+              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                <div className="w-full md:w-1/3">
+                  <label className="block text-xs uppercase tracking-wider text-gray-500 mb-2">Filter by Field</label>
+                  <select
+                    value={selectedField}
+                    onChange={(e) => setSelectedField(e.target.value)}
+                    className="w-full bg-parfumo-card text-parfumo-text border border-gray-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-parfumo-accent cursor-pointer"
+                  >
+                    <option value="">All Missing Fields</option>
+                    {availableFields.map((field) => (
+                      <option key={field} value={field}>
+                        {FIELD_LABELS[field] || field}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {perfumesWithMissing.length === 0 ? (
+                <div className="text-center py-16 text-gray-500">No missing fields found for the selected filter.</div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {perfumesWithMissing.map((perfume) => {
+                    const perfumeId = getPerfumeId(perfume);
+                    const missingFields = getMissingFieldsForPerfume(perfume);
+
+                    return (
+                      <div key={perfumeId} className="bg-parfumo-highlight/30 border border-gray-700 rounded-lg overflow-hidden">
+                        <div className="flex gap-4 p-4">
+                          <div className="w-[90px] h-[90px] flex-shrink-0 p-2 bg-white rounded-md">
+                            <CachedImage
+                              src={perfume.imageUrl}
+                              alt={perfume.name}
+                              pid={perfume.pid}
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs uppercase text-gray-400 tracking-wider font-semibold truncate">
+                              {perfume.brand || 'Unknown Brand'}
+                            </div>
+                            <div className="text-parfumo-text text-base font-semibold truncate">
+                              {perfume.name || 'Unknown Name'}
+                            </div>
+                            {perfume.pid && (
+                              <div className="text-[10px] text-gray-500 mt-1">PID: {perfume.pid}</div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="px-4 pb-4 space-y-3">
+                          {missingFields.map((field) => (
+                            <div key={`${perfumeId}-${field}`}>
+                              <label className="block text-[11px] uppercase tracking-wider text-red-300 mb-1">
+                                {FIELD_LABELS[field] || field}
+                              </label>
+                              <input
+                                type="text"
+                                value={overrides[perfumeId]?.[field] ?? ''}
+                                onChange={(e) => handleFieldChange(perfumeId, field, e.target.value)}
+                                placeholder={`Enter ${FIELD_LABELS[field] || field}`}
+                                className="w-full bg-black/20 text-red-200 border border-red-500/70 rounded px-3 py-2 text-sm focus:outline-none focus:border-red-400 placeholder-red-400/70"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'entries' && (
+            <div className="bg-parfumo-card/60 border border-gray-700 rounded-lg p-4 space-y-4">
             <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
               <div className="w-full md:w-1/2">
                 <label className="block text-xs uppercase tracking-wider text-gray-500 mb-2">Browse Field Entries</label>
@@ -277,30 +367,51 @@ const MissingFieldsModal: React.FC<MissingFieldsModalProps> = ({ isOpen, onClose
                   {perfumesForEntry.length} perfumes with {FIELD_LABELS[entryField] || entryField}: {entryOptions.find((e) => e.key === selectedEntry)?.label}
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
-                  <input
-                    type="text"
-                    value={bulkValue}
-                    onChange={(e) => setBulkValue(e.target.value)}
-                    placeholder={`Replace ${FIELD_LABELS[entryField] || entryField} with...`}
-                    className="w-full md:flex-1 bg-black/20 text-parfumo-text border border-gray-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-parfumo-accent"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,auto] gap-3 items-end">
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider text-gray-500 mb-2">Target Field</label>
+                    <select
+                      value={bulkTargetField}
+                      onChange={(e) => setBulkTargetField(e.target.value)}
+                      className="w-full bg-parfumo-card text-parfumo-text border border-gray-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-parfumo-accent cursor-pointer"
+                    >
+                      <option value="">Select a field</option>
+                      {availableFields.map((field) => (
+                        <option key={field} value={field}>
+                          {FIELD_LABELS[field] || field}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider text-gray-500 mb-2">New Value</label>
+                    <input
+                      type="text"
+                      value={bulkTargetValue}
+                      onChange={(e) => setBulkTargetValue(e.target.value)}
+                      placeholder={`Set ${FIELD_LABELS[bulkTargetField] || 'field'} to...`}
+                      className="w-full bg-black/20 text-parfumo-text border border-gray-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-parfumo-accent"
+                    />
+                  </div>
                   <button
                     type="button"
-                    onClick={handleApplyBulk}
-                    disabled={bulkValue.trim() === '' || perfumesForEntry.length === 0}
-                    className="px-4 py-2 rounded bg-parfumo-accent/90 hover:bg-parfumo-accent text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={handleApplyTargetBulk}
+                    disabled={bulkTargetField === '' || bulkTargetValue.trim() === '' || perfumesForEntry.length === 0}
+                    className="h-[38px] px-4 py-2 rounded bg-parfumo-accent/90 hover:bg-parfumo-accent text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Apply to {perfumesForEntry.length} perfumes
+                    Apply to all
                   </button>
                 </div>
 
-                <div className="max-h-52 overflow-y-auto space-y-2">
+                <div className="max-h-40 overflow-y-auto space-y-2">
                   {perfumesForEntry.map((perfume) => {
                     const perfumeId = getPerfumeId(perfume);
+                    const targetValue = bulkTargetField
+                      ? overrides[perfumeId]?.[bulkTargetField] ?? String(perfume[bulkTargetField] ?? '')
+                      : '';
                     return (
                       <div
-                        key={`${perfumeId}-${entryField}`}
+                        key={`${perfumeId}-${entryField}-bulk`}
                         className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm bg-black/20 border border-gray-700 rounded px-3 py-2"
                       >
                         <div className="min-w-0">
@@ -310,13 +421,23 @@ const MissingFieldsModal: React.FC<MissingFieldsModalProps> = ({ isOpen, onClose
                           <div className="text-parfumo-text truncate">{perfume.name || 'Unknown Name'}</div>
                           <div className="text-[10px] text-gray-500">PID: {perfume.pid || 'n/a'}</div>
                         </div>
-                        <input
-                          type="text"
-                          value={overrides[perfumeId]?.[entryField] ?? String(perfume[entryField] ?? '')}
-                          onChange={(e) => handleFieldChange(perfumeId, entryField, e.target.value)}
-                          className="w-full md:w-64 bg-black/30 text-parfumo-text border border-gray-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-parfumo-accent"
-                          placeholder={`Edit ${FIELD_LABELS[entryField] || entryField}`}
-                        />
+                        <div className="w-full md:w-64">
+                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">
+                            {FIELD_LABELS[bulkTargetField] || bulkTargetField || 'Target Field'}
+                          </div>
+                          <input
+                            type="text"
+                            value={targetValue}
+                            onChange={(e) => handleFieldChange(perfumeId, bulkTargetField, e.target.value)}
+                            disabled={bulkTargetField === ''}
+                            className="w-full bg-black/30 text-parfumo-text border border-gray-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-parfumo-accent disabled:opacity-50"
+                            placeholder={
+                              bulkTargetField
+                                ? `Edit ${FIELD_LABELS[bulkTargetField] || bulkTargetField}`
+                                : 'Select a target field'
+                            }
+                          />
+                        </div>
                       </div>
                     );
                   })}
@@ -324,59 +445,6 @@ const MissingFieldsModal: React.FC<MissingFieldsModalProps> = ({ isOpen, onClose
               </div>
             )}
           </div>
-
-          {perfumesWithMissing.length === 0 ? (
-            <div className="text-center py-16 text-gray-500">No missing fields found for the selected filter.</div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {perfumesWithMissing.map((perfume) => {
-                const perfumeId = getPerfumeId(perfume);
-                const missingFields = getMissingFieldsForPerfume(perfume);
-
-                return (
-                  <div key={perfumeId} className="bg-parfumo-highlight/30 border border-gray-700 rounded-lg overflow-hidden">
-                    <div className="flex gap-4 p-4">
-                      <div className="w-[90px] h-[90px] flex-shrink-0 p-2 bg-white rounded-md">
-                        <CachedImage
-                          src={perfume.imageUrl}
-                          alt={perfume.name}
-                          pid={perfume.pid}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs uppercase text-gray-400 tracking-wider font-semibold truncate">
-                          {perfume.brand || 'Unknown Brand'}
-                        </div>
-                        <div className="text-parfumo-text text-base font-semibold truncate">
-                          {perfume.name || 'Unknown Name'}
-                        </div>
-                        {perfume.pid && (
-                          <div className="text-[10px] text-gray-500 mt-1">PID: {perfume.pid}</div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="px-4 pb-4 space-y-3">
-                      {missingFields.map((field) => (
-                        <div key={`${perfumeId}-${field}`}>
-                          <label className="block text-[11px] uppercase tracking-wider text-red-300 mb-1">
-                            {FIELD_LABELS[field] || field}
-                          </label>
-                          <input
-                            type="text"
-                            value={overrides[perfumeId]?.[field] ?? ''}
-                            onChange={(e) => handleFieldChange(perfumeId, field, e.target.value)}
-                            placeholder={`Enter ${FIELD_LABELS[field] || field}`}
-                            className="w-full bg-black/20 text-red-200 border border-red-500/70 rounded px-3 py-2 text-sm focus:outline-none focus:border-red-400 placeholder-red-400/70"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           )}
         </div>
 
