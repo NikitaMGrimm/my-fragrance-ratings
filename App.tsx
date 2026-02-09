@@ -15,6 +15,12 @@ const App: React.FC = () => {
   const [perfumes, setPerfumes] = useState<Perfume[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>(SortOption.RATING_DESC);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [selectedBrand, setSelectedBrand] = useState<string>('');
+  const [selectedSegment, setSelectedSegment] = useState<string>('');
+  const [ratingMin, setRatingMin] = useState<string>('');
+  const [ratingMax, setRatingMax] = useState<string>('');
+  const [priceMin, setPriceMin] = useState<string>('');
+  const [priceMax, setPriceMax] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isMissingFieldsOpen, setIsMissingFieldsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -106,15 +112,85 @@ const App: React.FC = () => {
     savePerfumes(updated);
   };
 
+  const segmentFieldKey = useMemo(() => {
+    const allKeys = new Set<string>();
+    perfumes.forEach((p) => Object.keys(p).forEach((k) => allKeys.add(k)));
+
+    for (const key of allKeys) {
+      const normalized = key.toLowerCase().replace(/\s+/g, ' ').trim();
+      if (normalized === 'market segment') return key;
+    }
+
+    return '';
+  }, [perfumes]);
+
+  const brandOptions = useMemo(() => {
+    const brands = new Set<string>();
+    perfumes.forEach((p) => {
+      if (p.brand) brands.add(p.brand);
+    });
+    return Array.from(brands).sort((a, b) => a.localeCompare(b));
+  }, [perfumes]);
+
+  const segmentOptions = useMemo(() => {
+    if (!segmentFieldKey) return [] as string[];
+    const segments = new Set<string>();
+    perfumes.forEach((p) => {
+      const value = p[segmentFieldKey];
+      if (value) segments.add(String(value));
+    });
+    return Array.from(segments).sort((a, b) => a.localeCompare(b));
+  }, [perfumes, segmentFieldKey]);
+
+  const handleResetFilters = () => {
+    setSelectedBrand('');
+    setSelectedSegment('');
+    setRatingMin('');
+    setRatingMax('');
+    setPriceMin('');
+    setPriceMax('');
+  };
+
   const processedPerfumes = useMemo(() => {
     let result = [...perfumes];
 
     if (searchTerm) {
       const lowerTerm = searchTerm.toLowerCase();
-      result = result.filter(p => 
-        (p.name && p.name.toLowerCase().includes(lowerTerm)) || 
-        (p.brand && p.brand.toLowerCase().includes(lowerTerm))
-      );
+      result = result.filter((p) => {
+        const segmentValue = segmentFieldKey ? String(p[segmentFieldKey] ?? '') : '';
+        return (
+          (p.name && p.name.toLowerCase().includes(lowerTerm)) ||
+          (p.brand && p.brand.toLowerCase().includes(lowerTerm)) ||
+          (p.pid && String(p.pid).toLowerCase().includes(lowerTerm)) ||
+          (segmentValue && segmentValue.toLowerCase().includes(lowerTerm))
+        );
+      });
+    }
+
+    if (selectedBrand) {
+      result = result.filter((p) => p.brand === selectedBrand);
+    }
+
+    if (selectedSegment && segmentFieldKey && selectedBrand === '') {
+      result = result.filter((p) => String(p[segmentFieldKey] ?? '') === selectedSegment);
+    }
+
+    const minRating = ratingMin.trim() === '' ? undefined : Number(ratingMin);
+    const maxRating = ratingMax.trim() === '' ? undefined : Number(ratingMax);
+    if (Number.isFinite(minRating)) {
+      result = result.filter((p) => (p.rating ?? 0) >= (minRating as number));
+    }
+    if (Number.isFinite(maxRating)) {
+      result = result.filter((p) => (p.rating ?? 0) <= (maxRating as number));
+    }
+
+    const minPrice = priceMin.trim() === '' ? undefined : Number(priceMin);
+    const maxPrice = priceMax.trim() === '' ? undefined : Number(priceMax);
+    if (Number.isFinite(minPrice)) {
+      result = result.filter((p) => typeof p.price === 'number' && p.price >= (minPrice as number));
+    }
+    if (Number.isFinite(maxPrice)) {
+      result = result.filter((p) => typeof p.price === 'number' && p.price <= (maxPrice as number));
     }
 
     result.sort((a, b) => {
@@ -133,7 +209,18 @@ const App: React.FC = () => {
     });
 
     return result;
-  }, [perfumes, sortOption, searchTerm]);
+  }, [
+    perfumes,
+    sortOption,
+    searchTerm,
+    selectedBrand,
+    selectedSegment,
+    ratingMin,
+    ratingMax,
+    priceMin,
+    priceMax,
+    segmentFieldKey
+  ]);
 
   useEffect(() => {
     setVisibleCount(50);
@@ -203,6 +290,21 @@ const App: React.FC = () => {
           onSortChange={setSortOption}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
+          brandOptions={brandOptions}
+          segmentOptions={segmentOptions}
+          selectedBrand={selectedBrand}
+          selectedSegment={selectedSegment}
+          ratingMin={ratingMin}
+          ratingMax={ratingMax}
+          priceMin={priceMin}
+          priceMax={priceMax}
+          onBrandChange={setSelectedBrand}
+          onSegmentChange={setSelectedSegment}
+          onRatingMinChange={setRatingMin}
+          onRatingMaxChange={setRatingMax}
+          onPriceMinChange={setPriceMin}
+          onPriceMaxChange={setPriceMax}
+          onResetFilters={handleResetFilters}
         />
 
         {isLoading ? (
