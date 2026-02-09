@@ -140,7 +140,7 @@ const computeApproxDate = (commitDateIso, timeRatedRaw) => {
 };
 
 const getCommitHistory = () => {
-  const output = run(`git log --follow --reverse --format='%H\t%cI\t%s' -- "${FILE_PATH}"`);
+  const output = run(`git log --follow --format='%H\t%cI\t%s%n' -- "${FILE_PATH}"`);
   if (!output) return [];
   return output
     .split('\n')
@@ -153,12 +153,16 @@ const getCommitHistory = () => {
       const message = parts.slice(2).join('\t');
       return { sha, date, message };
     })
-    .filter((entry) => entry.sha && entry.date);
+    .filter((entry) => entry.sha && entry.date)
+    .reverse();
 };
 
 const loadCsvAtCommit = (sha) => {
   try {
-    return execSync(`git show ${sha}:${FILE_PATH}`, { encoding: 'utf8' });
+    return execSync(`git show ${sha}:${FILE_PATH}`, {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    });
   } catch {
     return '';
   }

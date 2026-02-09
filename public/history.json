@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-09T21:16:00.353Z",
+  "generatedAt": "2026-02-09T21:24:26.667Z",
   "sourcePath": "public/constants.csv",
   "pageSize": 100,
   "commits": [
@@ -9,6 +9,27 @@
       "message": "Serve default assets from public",
       "label": "2026-02-08 · d4155c6 · Serve default assets from public",
       "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/d4155c6ff73adb098b5b818b90cc53c53c2f1467/public/constants.csv"
+    },
+    {
+      "sha": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+      "date": "2026-02-09T18:48:13+01:00",
+      "message": "Update perfume data and images",
+      "label": "2026-02-09 · e944b74 · Update perfume data and images",
+      "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/e944b74ecd2d63a4768edc03b743a585f5e3781d/public/constants.csv"
+    },
+    {
+      "sha": "b7c4a009631282008019b7273358f1fa63f8c1c8",
+      "date": "2026-02-09T19:39:03+01:00",
+      "message": "Update perfume classifications",
+      "label": "2026-02-09 · b7c4a00 · Update perfume classifications",
+      "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/b7c4a009631282008019b7273358f1fa63f8c1c8/public/constants.csv"
+    },
+    {
+      "sha": "964fcf0f10245d38bc23849215483b77b45468a5",
+      "date": "2026-02-09T19:49:49+01:00",
+      "message": "Remove Zone.Identifier metadata",
+      "label": "2026-02-09 · 964fcf0 · Remove Zone.Identifier metadata",
+      "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/964fcf0f10245d38bc23849215483b77b45468a5/public/constants.csv"
     }
   ],
   "fragrances": [
@@ -217,6 +238,29 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "2 hours ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        },
+        {
+          "rating": 7.5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
+        }
+      ]
+    },
+    {
+      "id": "205938",
+      "pid": "205938",
+      "brand": "Azzaro",
+      "name": "Wanted EAU DE PARFUM",
+      "firstSeenAt": "2026-02-09T15:48:13.000Z",
+      "ratings": [
+        {
+          "rating": 6,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
         }
       ]
     },
@@ -313,6 +357,22 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "5 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        }
+      ]
+    },
+    {
+      "id": "17861",
+      "pid": "17861",
+      "brand": "Chanel",
+      "name": "Allure Homme Sport Eau Extrême",
+      "firstSeenAt": "2026-02-09T15:48:13.000Z",
+      "ratings": [
+        {
+          "rating": 5.5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
         }
       ]
     },
@@ -509,6 +569,22 @@
       ]
     },
     {
+      "id": "1484",
+      "pid": "1484",
+      "brand": "Dolce & Gabbana",
+      "name": "Light Blue pour Homme EAU DE TOILETTE",
+      "firstSeenAt": "2026-02-09T15:48:13.000Z",
+      "ratings": [
+        {
+          "rating": 5.5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
+        }
+      ]
+    },
+    {
       "id": "134887",
       "pid": "134887",
       "brand": "Dolce & Gabbana",
@@ -521,6 +597,13 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "2 hours ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        },
+        {
+          "rating": 7.5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
         }
       ]
     },
@@ -601,6 +684,13 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "6 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        },
+        {
+          "rating": 6,
+          "date": "2026-02-09T11:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "6 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
         }
       ]
     },
@@ -617,6 +707,22 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "6 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        }
+      ]
+    },
+    {
+      "id": "302",
+      "pid": "302",
+      "brand": "Giorgio Armani",
+      "name": "Armani Code (2004) EAU DE TOILETTE",
+      "firstSeenAt": "2026-02-09T15:48:13.000Z",
+      "ratings": [
+        {
+          "rating": 5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
         }
       ]
     },
@@ -765,6 +871,22 @@
       ]
     },
     {
+      "id": "195318",
+      "pid": "195318",
+      "brand": "Givenchy",
+      "name": "Gentleman Society EAU DE PARFUM",
+      "firstSeenAt": "2026-02-09T15:48:13.000Z",
+      "ratings": [
+        {
+          "rating": 6.5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
+        }
+      ]
+    },
+    {
       "id": "81632",
       "pid": "81632",
       "brand": "Goldfield & Banks",
@@ -777,6 +899,22 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "6 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        }
+      ]
+    },
+    {
+      "id": "85285",
+      "pid": "85285",
+      "brand": "Guerlain",
+      "name": "Aqua Allegoria Bergamote Calabria",
+      "firstSeenAt": "2026-02-09T15:48:13.000Z",
+      "ratings": [
+        {
+          "rating": 7.5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
         }
       ]
     },
@@ -845,6 +983,38 @@
       ]
     },
     {
+      "id": "124335",
+      "pid": "124335",
+      "brand": "Hugo Boss",
+      "name": "Boss Bottled Infinite",
+      "firstSeenAt": "2026-02-09T15:48:13.000Z",
+      "ratings": [
+        {
+          "rating": 5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
+        }
+      ]
+    },
+    {
+      "id": "239156",
+      "pid": "239156",
+      "brand": "Hugo Boss",
+      "name": "The Scent Elixir for Him",
+      "firstSeenAt": "2026-02-09T15:48:13.000Z",
+      "ratings": [
+        {
+          "rating": 5.5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
+        }
+      ]
+    },
+    {
       "id": "133033",
       "pid": "133033",
       "brand": "Initio",
@@ -873,6 +1043,13 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "2 hours ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        },
+        {
+          "rating": 7.5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
         }
       ]
     },
@@ -1017,6 +1194,22 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "3 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        }
+      ]
+    },
+    {
+      "id": "140",
+      "pid": "140",
+      "brand": "Joop!",
+      "name": "Joop! Homme EAU DE TOILETTE",
+      "firstSeenAt": "2026-02-09T15:48:13.000Z",
+      "ratings": [
+        {
+          "rating": 3.5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
         }
       ]
     },
@@ -1517,6 +1710,22 @@
       ]
     },
     {
+      "id": "151280",
+      "pid": "151280",
+      "brand": "Ralph Lauren",
+      "name": "Ralph's Club EAU DE PARFUM",
+      "firstSeenAt": "2026-02-09T15:48:13.000Z",
+      "ratings": [
+        {
+          "rating": 6,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
+        }
+      ]
+    },
+    {
       "id": "335581",
       "pid": "335581",
       "brand": "Ralph Lauren",
@@ -1677,6 +1886,22 @@
       ]
     },
     {
+      "id": "232733",
+      "pid": "232733",
+      "brand": "Swiss Arabian",
+      "name": "Shaghaf Oud Tonka EAU DE PARFUM",
+      "firstSeenAt": "2026-02-09T15:48:13.000Z",
+      "ratings": [
+        {
+          "rating": 8,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
+        }
+      ]
+    },
+    {
       "id": "284863",
       "pid": "284863",
       "brand": "Swiss Arabian",
@@ -1689,6 +1914,13 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "2 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        },
+        {
+          "rating": 7.5,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
         }
       ]
     },
@@ -1769,6 +2001,13 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "19 hours ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        },
+        {
+          "rating": 8,
+          "date": "2026-02-09T15:48:13.000Z",
+          "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-02-09T18:48:13+01:00"
         }
       ]
     },
