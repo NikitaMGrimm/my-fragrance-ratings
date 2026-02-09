@@ -4,6 +4,7 @@ import { Perfume, SortOption } from './types';
 import PerfumeCard from './components/PerfumeCard';
 import FilterBar from './components/FilterBar';
 import SettingsModal from './components/SettingsModal';
+import MissingFieldsModal from './components/MissingFieldsModal';
 import RatingChart from './components/RatingChart';
 import PriceScatterChart from './components/PriceScatterChart';
 import { loadPerfumesFromStorage, fetchDefaultCSV, savePerfumes, clearUnusedImages } from './utils/storage';
@@ -15,6 +16,7 @@ const App: React.FC = () => {
   const [sortOption, setSortOption] = useState<SortOption>(SortOption.RATING_DESC);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isMissingFieldsOpen, setIsMissingFieldsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
   const [visibleCount, setVisibleCount] = useState(50);
@@ -99,6 +101,11 @@ const App: React.FC = () => {
       await exportCollection(perfumes);
   };
 
+  const handleMissingFieldsSave = (updated: Perfume[]) => {
+    setPerfumes(updated);
+    savePerfumes(updated);
+  };
+
   const processedPerfumes = useMemo(() => {
     let result = [...perfumes];
 
@@ -160,18 +167,26 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-parfumo-bg p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-6 border-b border-gray-700 pb-4 flex justify-between items-end">
+        <header className="mb-6 border-b border-gray-700 pb-4 flex flex-col md:flex-row md:justify-between md:items-end gap-3">
             <div>
               <h1 className="text-3xl font-bold text-parfumo-text mb-2">My Ratings</h1>
               <p className="text-gray-500 text-sm">Collection Overview</p>
             </div>
-            <button 
-              onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center space-x-2 text-parfumo-accent hover:text-white transition-colors text-sm font-medium px-4 py-2 bg-parfumo-card rounded border border-gray-700 hover:border-parfumo-accent"
-            >
-              <Settings size={16} />
-              <span>Import / Settings</span>
-            </button>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => setIsMissingFieldsOpen(true)}
+                className="flex items-center space-x-2 text-red-300 hover:text-white transition-colors text-sm font-medium px-4 py-2 bg-parfumo-card rounded border border-red-500/40 hover:border-red-400"
+              >
+                <span>Fix Missing Fields</span>
+              </button>
+              <button 
+                onClick={() => setIsSettingsOpen(true)}
+                className="flex items-center space-x-2 text-parfumo-accent hover:text-white transition-colors text-sm font-medium px-4 py-2 bg-parfumo-card rounded border border-gray-700 hover:border-parfumo-accent"
+              >
+                <Settings size={16} />
+                <span>Import / Settings</span>
+              </button>
+            </div>
         </header>
 
         {!isLoading && perfumes.length > 0 && (
@@ -220,6 +235,13 @@ const App: React.FC = () => {
           onImport={handleImport}
           onClearCache={handleClearCache}
           onExport={handleExport}
+        />
+
+        <MissingFieldsModal
+          isOpen={isMissingFieldsOpen}
+          onClose={() => setIsMissingFieldsOpen(false)}
+          perfumes={perfumes}
+          onSave={handleMissingFieldsSave}
         />
       </div>
     </div>
