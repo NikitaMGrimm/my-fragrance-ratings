@@ -42,6 +42,14 @@ export const savePerfumes = (perfumes: Perfume[]) => {
   }
 };
 
+export const clearStoredPerfumes = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {
+    console.error("Failed to clear local storage", e);
+  }
+};
+
 const openDB = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -121,4 +129,13 @@ export const clearUnusedImages = async (activeUrls: string[]): Promise<number> =
     console.error("Failed to clear cache", e);
     return 0;
   }
+};
+
+export const clearImageCache = async (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.deleteDatabase(DB_NAME);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    request.onblocked = () => resolve();
+  });
 };

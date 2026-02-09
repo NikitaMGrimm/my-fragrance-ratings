@@ -7,9 +7,21 @@ import SettingsModal from './components/SettingsModal';
 import MissingFieldsModal from './components/MissingFieldsModal';
 import RatingChart from './components/RatingChart';
 import PriceScatterChart from './components/PriceScatterChart';
-import { loadPerfumesFromStorage, fetchDefaultCSV, savePerfumes, clearUnusedImages } from './utils/storage';
+import { loadPerfumesFromStorage, fetchDefaultCSV, savePerfumes, clearUnusedImages, clearStoredPerfumes, clearImageCache } from './utils/storage';
 import { Settings } from 'lucide-react';
 import { exportCollection } from './utils/exporter';
+
+type RepoInfo = {
+  owner: string;
+  repo: string;
+};
+
+type RepoCommit = {
+  sha: string;
+  date: string;
+  message: string;
+  label: string;
+};
 
 const App: React.FC = () => {
   const [perfumes, setPerfumes] = useState<Perfume[]>([]);
@@ -24,6 +36,11 @@ const App: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isMissingFieldsOpen, setIsMissingFieldsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [repoInfo, setRepoInfo] = useState<RepoInfo | null>(null);
+  const [repoHistory, setRepoHistory] = useState<RepoCommit[]>([]);
+  const [repoHistoryError, setRepoHistoryError] = useState('');
+  const [isRepoHistoryLoading, setIsRepoHistoryLoading] = useState(false);
   
   const [visibleCount, setVisibleCount] = useState(50);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -42,6 +59,41 @@ const App: React.FC = () => {
     };
     initData();
   }, []);
+
+  useEffect(() => {
+    if (!repoInfo) {
+      setRepoInfo(resolveRepoInfo());
+    }
+  }, [repoInfo]);
+
+  const resolveRepoInfo = (): RepoInfo | null => {
+    const envOwner = import.meta.env.VITE_GITHUB_OWNER as string | undefined;
+    const envRepo = import.meta.env.VITE_GITHUB_REPO as string | undefined;
+    if (envOwner && envRepo) {
+      return { owner: envOwner, repo: envRepo };
+    }
+
+    if (typeof window !== 'undefined') {
+      const host = window.location.hostname.toLowerCase();
+      if (host.endsWith('github.io')) {
+        const owner = host.split('.')[0];
+        const pathSegments = window.location.pathname.split('/').filter(Boolean);
+        if (pathSegments.length > 0) {
+          return { owner, repo: pathSegments[0] };
+        }
+      }
+    }
+
+    return null;
+  };
+
+  const formatCommitLabel = (dateIso: string, sha: string, message: string) => {
+    const date = new Date(dateIso);
+    const dateLabel = Number.isNaN(date.valueOf()) ? dateIso : date.toISOString().slice(0, 10);
+    const summary = message.split('\n')[0].trim();
+    const shortSha = sha.slice(0, 7);
+    return `${dateLabel} · ${shortSha} · ${summary}`;
+  };
 
   const handleImport = (csvContent: string, overwrite: boolean) => {
     const parsedData = parseCSV(csvContent);
@@ -102,9 +154,97 @@ const App: React.FC = () => {
       alert(`Cache cleared! ${count} unused images removed.`);
     }
   };
+
+  const handleResetStorage = async () => {
+    const confirmed = window.confirm("Reset storage to the default collection and clear cached images? This will remove your local changes.");
+    if (!confirmed) return;
+
+    setIsLoading(true);
+    clearStoredPerfumes();
+
+    try {
+      await clearImageCache();
+    } catch (e) {
+      console.warn("Failed to clear image cache", e);
+    }
+
+    const defaultData = await fetchDefaultCSV();
+    setPerfumes(defaultData);
+    setIsLoading(false);
+    alert("Storage reset to the default collection.");
+  };
   
   const handleExport = async () => {
       await exportCollection(perfumes);
+  };
+
+  const handleLoadRepoHistory = async () => {
+    setRepoHistoryError('');
+    setIsRepoHistoryLoading(true);
+
+    try {
+      const info = repoInfo ?? resolveRepoInfo();
+      if (!info) {
+        throw new Error('Repo not detected. Set VITE_GITHUB_OWNER and VITE_GITHUB_REPO, or deploy on GitHub Pages.');
+      }
+      setRepoInfo(info);
+
+      const apiUrl = `https://api.github.com/repos/${info.owner}/${info.repo}/commits?path=public/constants.csv&per_page=100`;
+      const response = await fetch(apiUrl, {
+        headers: { Accept: 'application/vnd.github+json' }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load history (${response.status})`);
+      }
+
+      const data = await response.json();
+      if (!Array.isArray(data)) {
+        throw new Error('Unexpected response from GitHub API.');
+      }
+      const commits = (data as any[]).map((entry) => {
+        const date = entry?.commit?.author?.date || entry?.commit?.committer?.date || '';
+        const message = entry?.commit?.message || '';
+        const sha = entry?.sha || '';
+        return {
+          sha,
+          date,
+          message,
+          label: formatCommitLabel(date, sha, message)
+        } as RepoCommit;
+      }).filter((commit) => commit.sha && commit.date);
+
+      setRepoHistory(commits);
+      if (commits.length === 0) {
+        setRepoHistoryError('No commits found for public/constants.csv.');
+      }
+    } catch (e: any) {
+      setRepoHistory([]);
+      setRepoHistoryError(e?.message || 'Failed to load repo history.');
+    } finally {
+      setIsRepoHistoryLoading(false);
+    }
+  };
+
+  const handleImportRepoVersion = async (sha: string, overwrite: boolean) => {
+    if (!sha) return;
+    const info = repoInfo ?? resolveRepoInfo();
+    if (!info) {
+      alert('Repo not detected. Set VITE_GITHUB_OWNER and VITE_GITHUB_REPO, or deploy on GitHub Pages.');
+      return;
+    }
+
+    try {
+      const rawUrl = `https://raw.githubusercontent.com/${info.owner}/${info.repo}/${sha}/public/constants.csv`;
+      const response = await fetch(rawUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch constants.csv (${response.status})`);
+      }
+      const csvText = await response.text();
+      handleImport(csvText, overwrite);
+    } catch (e: any) {
+      alert(e?.message || 'Failed to import repo version.');
+    }
   };
 
   const handleMissingFieldsSave = (updated: Perfume[]) => {
@@ -336,7 +476,14 @@ const App: React.FC = () => {
           onClose={() => setIsSettingsOpen(false)}
           onImport={handleImport}
           onClearCache={handleClearCache}
+          onResetStorage={handleResetStorage}
           onExport={handleExport}
+          repoInfo={repoInfo}
+          repoHistory={repoHistory}
+          repoHistoryError={repoHistoryError}
+          isRepoHistoryLoading={isRepoHistoryLoading}
+          onLoadRepoHistory={handleLoadRepoHistory}
+          onImportRepoVersion={handleImportRepoVersion}
         />
 
         <MissingFieldsModal

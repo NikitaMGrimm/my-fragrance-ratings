@@ -1,20 +1,58 @@
-import React, { useState, useRef } from 'react';
-import { X, Upload, Trash2, FileText, Download, Save } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { X, Upload, Trash2, FileText, Download, Save, GitBranch, RefreshCw } from 'lucide-react';
+
+type RepoInfo = {
+  owner: string;
+  repo: string;
+};
+
+type RepoCommit = {
+  sha: string;
+  date: string;
+  message: string;
+  label: string;
+};
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onImport: (fileContent: string, overwrite: boolean) => void;
   onClearCache: () => void;
+  onResetStorage: () => void;
   onExport: () => void;
+  repoInfo: RepoInfo | null;
+  repoHistory: RepoCommit[];
+  repoHistoryError: string;
+  isRepoHistoryLoading: boolean;
+  onLoadRepoHistory: () => void;
+  onImportRepoVersion: (sha: string, overwrite: boolean) => void;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onImport, onClearCache, onExport }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({
+  isOpen,
+  onClose,
+  onImport,
+  onClearCache,
+  onResetStorage,
+  onExport,
+  repoInfo,
+  repoHistory,
+  repoHistoryError,
+  isRepoHistoryLoading,
+  onLoadRepoHistory,
+  onImportRepoVersion
+}) => {
   const [overwrite, setOverwrite] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [selectedCommit, setSelectedCommit] = useState('');
+  const [isImportingRepo, setIsImportingRepo] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (!selectedCommit && repoHistory.length > 0) {
+      setSelectedCommit(repoHistory[0].sha);
+    }
+  }, [repoHistory, selectedCommit]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,6 +73,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onImport
       await onExport();
       setIsExporting(false);
   }
+
+  const handleRepoImportClick = async () => {
+    if (!selectedCommit) return;
+    setIsImportingRepo(true);
+    await onImportRepoVersion(selectedCommit, overwrite);
+    setIsImportingRepo(false);
+    onClose();
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
@@ -103,6 +151,64 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onImport
               className="hidden" 
               onChange={handleFileChange} 
             />
+
+            <div className="bg-[#1a1e24] p-3 rounded border border-gray-700/50 text-xs text-gray-400 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-gray-300">
+                  <GitBranch size={14} className="text-gray-500" />
+                  <span className="font-semibold">Repo history import</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={onLoadRepoHistory}
+                  disabled={isRepoHistoryLoading}
+                  className="inline-flex items-center gap-2 text-[11px] px-2 py-1 rounded border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 disabled:opacity-50"
+                >
+                  <RefreshCw size={12} className={isRepoHistoryLoading ? 'animate-spin' : ''} />
+                  {isRepoHistoryLoading ? 'Loading' : 'Fetch history'}
+                </button>
+              </div>
+
+              <div className="text-[11px] text-gray-500">
+                {repoInfo
+                  ? `Detected repo: ${repoInfo.owner}/${repoInfo.repo}`
+                  : 'Repo not detected. Set VITE_GITHUB_OWNER + VITE_GITHUB_REPO or deploy on GitHub Pages.'}
+              </div>
+
+              {repoHistoryError && (
+                <div className="text-[11px] text-red-400">{repoHistoryError}</div>
+              )}
+
+              <div className="space-y-2">
+                <select
+                  value={selectedCommit}
+                  onChange={(e) => setSelectedCommit(e.target.value)}
+                  className="w-full bg-parfumo-card text-parfumo-text border border-gray-600 rounded px-3 py-2 text-xs focus:outline-none focus:border-parfumo-accent cursor-pointer"
+                  disabled={repoHistory.length === 0}
+                >
+                  <option value="">Select a commit date</option>
+                  {repoHistory.map((commit) => (
+                    <option key={commit.sha} value={commit.sha}>
+                      {commit.label}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="button"
+                  onClick={handleRepoImportClick}
+                  disabled={!selectedCommit || isImportingRepo}
+                  className="w-full flex items-center justify-center space-x-2 border border-parfumo-accent/40 text-parfumo-accent hover:bg-parfumo-accent/10 py-2.5 rounded transition-colors font-medium text-xs disabled:opacity-50"
+                >
+                  {isImportingRepo ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-parfumo-accent border-t-transparent rounded-full"></div>
+                  ) : (
+                    <Upload size={14} />
+                  )}
+                  <span>{isImportingRepo ? 'Importing...' : 'Import selected version'}</span>
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="border-t border-gray-700 pt-6 space-y-6">
@@ -142,6 +248,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onImport
                 <p className="text-xs text-gray-500 mt-2 text-center">
                 Frees up space by deleting cached images not found in your current list.
                 </p>
+
+              <button 
+              onClick={onResetStorage}
+              className="w-full mt-4 flex items-center justify-center space-x-2 border border-red-500/30 text-red-400 hover:bg-red-500/10 py-3 rounded transition-colors font-medium text-sm"
+              >
+              <Trash2 size={16} />
+              <span>Reset Storage to Default</span>
+              </button>
+              <p className="text-xs text-gray-500 mt-2 text-center">
+              Clears local changes and cached images, then reloads the default collection.
+              </p>
             </div>
           </div>
 
