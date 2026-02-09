@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:history": "node scripts/build-history.cjs"
   },
   "dependencies": {
     "react": "^19.2.4",

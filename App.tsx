@@ -21,7 +21,10 @@ type RepoCommit = {
   date: string;
   message: string;
   label: string;
+  rawUrl?: string;
 };
+
+const HISTORY_PAGE_SIZE = 100;
 
 const App: React.FC = () => {
   const [perfumes, setPerfumes] = useState<Perfume[]>([]);
@@ -39,6 +42,7 @@ const App: React.FC = () => {
 
   const [repoInfo, setRepoInfo] = useState<RepoInfo | null>(null);
   const [repoHistory, setRepoHistory] = useState<RepoCommit[]>([]);
+  const [repoHistoryAll, setRepoHistoryAll] = useState<RepoCommit[]>([]);
   const [repoHistoryError, setRepoHistoryError] = useState('');
   const [isRepoHistoryLoading, setIsRepoHistoryLoading] = useState(false);
   const [repoHistoryPage, setRepoHistoryPage] = useState(1);
@@ -95,24 +99,6 @@ const App: React.FC = () => {
     const summary = message.split('\n')[0].trim();
     const shortSha = sha.slice(0, 7);
     return `${dateLabel} · ${shortSha} · ${summary}`;
-  };
-
-  const parseNextPage = (linkHeader: string | null): number | null => {
-    if (!linkHeader) return null;
-    const links = linkHeader.split(',').map((part) => part.trim());
-    for (const link of links) {
-      const match = link.match(/<([^>]+)>;\s*rel="([^"]+)"/);
-      if (match && match[2] === 'next') {
-        try {
-          const url = new URL(match[1]);
-          const page = url.searchParams.get('page');
-          if (page) return Number(page);
-        } catch {
-          return null;
-        }
-      }
-    }
-    return null;
   };
 
   const handleImport = (csvContent: string, overwrite: boolean) => {
@@ -198,74 +184,6 @@ const App: React.FC = () => {
       await exportCollection(perfumes);
   };
 
-  const loadRepoHistoryPage = async (page: number, append: boolean) => {
-    const info = repoInfo ?? resolveRepoInfo();
-    if (!info) {
-      throw new Error('Repo not detected. Set VITE_GITHUB_OWNER and VITE_GITHUB_REPO, or deploy on GitHub Pages.');
-    }
-    setRepoInfo(info);
-
-    const apiUrl = `https://api.github.com/repos/${info.owner}/${info.repo}/commits?path=public/constants.csv&per_page=100&page=${page}`;
-    const token = import.meta.env.VITE_GITHUB_API_TOKEN as string | undefined;
-    const headers: HeadersInit = { Accept: 'application/vnd.github+json' };
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const response = await fetch(apiUrl, { headers });
-
-    if (!response.ok) {
-      let errorMessage = `Failed to load history (${response.status})`;
-      try {
-        const bodyText = await response.text();
-        if (bodyText) {
-          const parsed = JSON.parse(bodyText);
-          if (parsed?.message) {
-            errorMessage = `${errorMessage}: ${parsed.message}`;
-          }
-        }
-      } catch {
-        // Ignore parse errors.
-      }
-
-      const remaining = response.headers.get('x-ratelimit-remaining');
-      const reset = response.headers.get('x-ratelimit-reset');
-      if (remaining === '0' && reset) {
-        const resetAt = new Date(Number(reset) * 1000);
-        const resetLabel = Number.isNaN(resetAt.valueOf()) ? 'later' : resetAt.toLocaleTimeString();
-        errorMessage = `${errorMessage}. GitHub API rate limit exceeded, retry after ${resetLabel}.`;
-      }
-
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-    if (!Array.isArray(data)) {
-      throw new Error('Unexpected response from GitHub API.');
-    }
-
-    const commits = (data as any[]).map((entry) => {
-      const date = entry?.commit?.author?.date || entry?.commit?.committer?.date || '';
-      const message = entry?.commit?.message || '';
-      const sha = entry?.sha || '';
-      return {
-        sha,
-        date,
-        message,
-        label: formatCommitLabel(date, sha, message)
-      } as RepoCommit;
-    }).filter((commit) => commit.sha && commit.date);
-
-    const nextPage = parseNextPage(response.headers.get('link'));
-    setRepoHistoryHasMore(nextPage !== null && commits.length > 0);
-    setRepoHistoryPage(nextPage ?? page);
-
-    setRepoHistory((prev) => append ? [...prev, ...commits] : commits);
-    if (!append && commits.length === 0) {
-      setRepoHistoryError('No commits found for public/constants.csv.');
-    }
-  };
-
   const handleLoadRepoHistory = async () => {
     setRepoHistoryError('');
     setIsRepoHistoryLoading(true);
@@ -273,8 +191,36 @@ const App: React.FC = () => {
     setRepoHistoryPage(1);
 
     try {
-      await loadRepoHistoryPage(1, false);
+      const response = await fetch(`${import.meta.env.BASE_URL}history.json`, { cache: 'no-store' });
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('history.json not found. Run npm run build:history or wait for the GitHub Action.');
+        }
+        throw new Error(`Failed to load history (${response.status})`);
+      }
+
+      const data = await response.json();
+      const commits = Array.isArray(data?.commits) ? data.commits : [];
+      if (!Array.isArray(commits) || commits.length === 0) {
+        throw new Error('No commits found in history.json.');
+      }
+
+      const normalized = commits.map((entry: any) => {
+        const date = entry?.date || '';
+        const message = entry?.message || '';
+        const sha = entry?.sha || '';
+        const label = entry?.label || formatCommitLabel(date, sha, message);
+        const rawUrl = entry?.rawUrl || '';
+        return { sha, date, message, label, rawUrl } as RepoCommit;
+      }).filter((commit: RepoCommit) => commit.sha && commit.date);
+
+      setRepoHistoryAll(normalized);
+      const initial = normalized.slice(0, HISTORY_PAGE_SIZE);
+      setRepoHistory(initial);
+      setRepoHistoryHasMore(normalized.length > initial.length);
+      setRepoHistoryPage(1);
     } catch (e: any) {
+      setRepoHistoryAll([]);
       setRepoHistory([]);
       setRepoHistoryError(e?.message || 'Failed to load repo history.');
     } finally {
@@ -288,9 +234,11 @@ const App: React.FC = () => {
     setIsRepoHistoryLoading(true);
 
     try {
-      await loadRepoHistoryPage(repoHistoryPage, true);
-    } catch (e: any) {
-      setRepoHistoryError(e?.message || 'Failed to load more history.');
+      const nextPage = repoHistoryPage + 1;
+      const nextSlice = repoHistoryAll.slice(0, nextPage * HISTORY_PAGE_SIZE);
+      setRepoHistory(nextSlice);
+      setRepoHistoryPage(nextPage);
+      setRepoHistoryHasMore(nextSlice.length < repoHistoryAll.length);
     } finally {
       setIsRepoHistoryLoading(false);
     }
@@ -305,7 +253,8 @@ const App: React.FC = () => {
     }
 
     try {
-      const rawUrl = `https://raw.githubusercontent.com/${info.owner}/${info.repo}/${sha}/public/constants.csv`;
+      const commitEntry = repoHistoryAll.find((entry) => entry.sha === sha);
+      const rawUrl = commitEntry?.rawUrl || `https://raw.githubusercontent.com/${info.owner}/${info.repo}/${sha}/public/constants.csv`;
       const response = await fetch(rawUrl);
       if (!response.ok) {
         throw new Error(`Failed to fetch constants.csv (${response.status})`);
