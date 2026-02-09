@@ -3,6 +3,7 @@
 interface ImportMetaEnv {
   readonly VITE_GITHUB_OWNER?: string;
   readonly VITE_GITHUB_REPO?: string;
+  readonly VITE_GITHUB_API_TOKEN?: string;
 }
 
 interface ImportMeta {

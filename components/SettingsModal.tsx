@@ -24,7 +24,9 @@ interface SettingsModalProps {
   repoHistory: RepoCommit[];
   repoHistoryError: string;
   isRepoHistoryLoading: boolean;
+  repoHistoryHasMore: boolean;
   onLoadRepoHistory: () => void;
+  onLoadMoreRepoHistory: () => void;
   onImportRepoVersion: (sha: string, overwrite: boolean) => void;
 }
 
@@ -39,7 +41,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   repoHistory,
   repoHistoryError,
   isRepoHistoryLoading,
+  repoHistoryHasMore,
   onLoadRepoHistory,
+  onLoadMoreRepoHistory,
   onImportRepoVersion
 }) => {
   const [overwrite, setOverwrite] = useState(false);
@@ -193,6 +197,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     </option>
                   ))}
                 </select>
+
+                {repoHistoryHasMore && (
+                  <button
+                    type="button"
+                    onClick={onLoadMoreRepoHistory}
+                    disabled={isRepoHistoryLoading}
+                    className="w-full flex items-center justify-center space-x-2 border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 py-2 rounded transition-colors text-[11px] uppercase tracking-wider disabled:opacity-50"
+                  >
+                    <RefreshCw size={12} className={isRepoHistoryLoading ? 'animate-spin' : ''} />
+                    <span>{isRepoHistoryLoading ? 'Loading more' : 'Load more history'}</span>
+                  </button>
+                )}
 
                 <button
                   type="button"
