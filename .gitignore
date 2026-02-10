@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 *:Zone.Identifier
+
+# Local scripts
+scripts/local-import-export.sh
