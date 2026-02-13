@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-10T18:47:03.284Z",
+  "generatedAt": "2026-02-13T21:33:05.424Z",
   "sourcePath": "public/constants.csv",
   "pageSize": 100,
   "commits": [
@@ -44,6 +44,13 @@
       "message": "Update constants.csv and images from export",
       "label": "2026-02-10 · cc589ca · Update constants.csv and images from export",
       "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/cc589ca927baca824a38ea07aebbf60307f2979c/public/constants.csv"
+    },
+    {
+      "sha": "71eea92f260c0afdcaaefd4298e2c5930f6e651e",
+      "date": "2026-02-13T22:32:31+01:00",
+      "message": "update csv",
+      "label": "2026-02-13 · 71eea92 · update csv",
+      "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/71eea92f260c0afdcaaefd4298e2c5930f6e651e/public/constants.csv"
     }
   ],
   "fragrances": [
@@ -220,6 +227,22 @@
           "commit": "d29698d91e3142a8488887ba7243a6e9aed2ed5f",
           "timeRated": "21 minutes ago",
           "commitDate": "2026-02-10T19:46:52+01:00"
+        }
+      ]
+    },
+    {
+      "id": "73419",
+      "pid": "73419",
+      "brand": "Attar Collection",
+      "name": "Khaltat Night EAU DE PARFUM",
+      "firstSeenAt": "2026-02-11T21:32:31.000Z",
+      "ratings": [
+        {
+          "rating": 7,
+          "date": "2026-02-11T21:32:31.000Z",
+          "commit": "71eea92f260c0afdcaaefd4298e2c5930f6e651e",
+          "timeRated": "2 days ago",
+          "commitDate": "2026-02-13T22:32:31+01:00"
         }
       ]
     },
@@ -1565,6 +1588,13 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "6 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        },
+        {
+          "rating": 7,
+          "date": "2026-02-11T21:32:31.000Z",
+          "commit": "71eea92f260c0afdcaaefd4298e2c5930f6e651e",
+          "timeRated": "2 days ago",
+          "commitDate": "2026-02-13T22:32:31+01:00"
         }
       ]
     },
@@ -1629,6 +1659,13 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "2 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        },
+        {
+          "rating": 6.5,
+          "date": "2026-02-11T21:32:31.000Z",
+          "commit": "71eea92f260c0afdcaaefd4298e2c5930f6e651e",
+          "timeRated": "2 days ago",
+          "commitDate": "2026-02-13T22:32:31+01:00"
         }
       ]
     },
