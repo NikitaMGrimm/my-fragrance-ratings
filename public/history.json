@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-20T12:57:57.416Z",
+  "generatedAt": "2026-02-20T13:04:24.081Z",
   "sourcePath": "public/constants.csv",
   "pageSize": 100,
   "commits": [
@@ -58,6 +58,13 @@
       "message": "Update constants.csv and images from export",
       "label": "2026-02-20 · 3a61263 · Update constants.csv and images from export",
       "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/3a61263eec8ad409989b5b9aee08ff19e0af78d0/public/constants.csv"
+    },
+    {
+      "sha": "03e2d84b0f5d90d18751b9ec7cff568044227ec8",
+      "date": "2026-02-20T14:04:14+01:00",
+      "message": "Update constants.csv and images from export",
+      "label": "2026-02-20 · 03e2d84 · Update constants.csv and images from export",
+      "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/03e2d84b0f5d90d18751b9ec7cff568044227ec8/public/constants.csv"
     }
   ],
   "fragrances": [
