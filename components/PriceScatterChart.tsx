@@ -182,7 +182,7 @@ const PriceScatterChart: React.FC<PriceScatterChartProps> = ({ perfumes }) => {
 
       <div ref={chartWrapRef} className="relative flex-1 w-full min-h-0 touch-none overflow-visible" style={{ touchAction: 'none' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart margin={{ top: 20, right: 95, bottom: 20, left: -10 }}>
+          <ComposedChart margin={{ top: 20, right: 18, bottom: 0, left: -16 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             
             <XAxis 
@@ -195,7 +195,6 @@ const PriceScatterChart: React.FC<PriceScatterChartProps> = ({ perfumes }) => {
               tick={{ fill: '#9ca3af', fontSize: 10 }} 
               axisLine={{ stroke: '#4b5563' }}
               tickLine={false}
-              label={{ value: 'Price (Log Scale)', position: 'bottom', fill: '#6b7280', fontSize: 10, offset: 0 }}
               tickFormatter={(val) => Number(val).toLocaleString(undefined, { maximumFractionDigits: 0 })}
             />
             
@@ -203,7 +202,7 @@ const PriceScatterChart: React.FC<PriceScatterChartProps> = ({ perfumes }) => {
               type="number" 
               dataKey="y" 
               name="Rating" 
-              domain={[-0.5, 10.5]}
+              domain={[0, 10]}
               tick={{ fill: '#9ca3af', fontSize: 10 }} 
               axisLine={{ stroke: '#4b5563' }}
               tickLine={false}
@@ -251,10 +250,10 @@ const PriceScatterChart: React.FC<PriceScatterChartProps> = ({ perfumes }) => {
               <Label 
                 content={({ viewBox }: any) => {
                   if (!viewBox) return null;
-                  const x = viewBox.x + viewBox.width + 8;
+                  const x = viewBox.x + viewBox.width - 6;
                   const y = Math.max(viewBox.y - 4, 14);
                   return (
-                    <text x={x} y={y} fill="#22c55e" fontSize={11} fontWeight="bold" textAnchor="start">
+                    <text x={x} y={y} fill="#22c55e" fontSize={11} fontWeight="bold" textAnchor="end">
                       <tspan x={x} dy="0">Avg:</tspan>
                       <tspan x={x} dy="12">{meanRating.toFixed(2)}</tspan>
                     </text>
