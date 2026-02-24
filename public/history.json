@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-23T17:04:39.121Z",
+  "generatedAt": "2026-02-24T13:25:49.994Z",
   "sourcePath": "public/constants.csv",
   "pageSize": 100,
   "commits": [
@@ -79,6 +79,13 @@
       "message": "Update constants.csv and images from export",
       "label": "2026-02-23 · 5cf9c89 · Update constants.csv and images from export",
       "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/5cf9c897ff70d7f5e077b7ad86d80dd33422e23c/public/constants.csv"
+    },
+    {
+      "sha": "716765acc094d112022b8c6372a35877e211c6df",
+      "date": "2026-02-24T14:25:39+01:00",
+      "message": "Update constants.csv and images from export",
+      "label": "2026-02-24 · 716765a · Update constants.csv and images from export",
+      "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/716765acc094d112022b8c6372a35877e211c6df/public/constants.csv"
     }
   ],
   "fragrances": [
@@ -502,6 +509,22 @@
       ]
     },
     {
+      "id": "335269",
+      "pid": "335269",
+      "brand": "Calvin Klein",
+      "name": "Silky Coconut",
+      "firstSeenAt": "2026-02-24T13:06:39.000Z",
+      "ratings": [
+        {
+          "rating": 7,
+          "date": "2026-02-24T13:06:39.000Z",
+          "commit": "716765acc094d112022b8c6372a35877e211c6df",
+          "timeRated": "19 minutes ago",
+          "commitDate": "2026-02-24T14:25:39+01:00"
+        }
+      ]
+    },
+    {
       "id": "146899",
       "pid": "146899",
       "brand": "Carolina Herrera",
@@ -546,6 +569,22 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "3 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        }
+      ]
+    },
+    {
+      "id": "340072",
+      "pid": "340072",
+      "brand": "Chanel",
+      "name": "Bleu de Chanel L'Exclusif",
+      "firstSeenAt": "2026-02-24T13:12:39.000Z",
+      "ratings": [
+        {
+          "rating": 5.5,
+          "date": "2026-02-24T13:12:39.000Z",
+          "commit": "716765acc094d112022b8c6372a35877e211c6df",
+          "timeRated": "13 minutes ago",
+          "commitDate": "2026-02-24T14:25:39+01:00"
         }
       ]
     },
@@ -738,6 +777,22 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "5 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        }
+      ]
+    },
+    {
+      "id": "297160",
+      "pid": "297160",
+      "brand": "Dolce & Gabbana",
+      "name": "Devotion pour Homme EAU DE PARFUM",
+      "firstSeenAt": "2026-02-24T13:05:39.000Z",
+      "ratings": [
+        {
+          "rating": 3.5,
+          "date": "2026-02-24T13:05:39.000Z",
+          "commit": "716765acc094d112022b8c6372a35877e211c6df",
+          "timeRated": "20 minutes ago",
+          "commitDate": "2026-02-24T14:25:39+01:00"
         }
       ]
     },
@@ -1196,6 +1251,22 @@
           "commit": "3a61263eec8ad409989b5b9aee08ff19e0af78d0",
           "timeRated": "9 minutes ago",
           "commitDate": "2026-02-20T13:57:45+01:00"
+        }
+      ]
+    },
+    {
+      "id": "72724",
+      "pid": "72724",
+      "brand": "Guerlain",
+      "name": "L'Homme Idéal EAU DE PARFUM",
+      "firstSeenAt": "2026-02-24T13:02:39.000Z",
+      "ratings": [
+        {
+          "rating": 8,
+          "date": "2026-02-24T13:02:39.000Z",
+          "commit": "716765acc094d112022b8c6372a35877e211c6df",
+          "timeRated": "23 minutes ago",
+          "commitDate": "2026-02-24T14:25:39+01:00"
         }
       ]
     },
@@ -1873,6 +1944,22 @@
       ]
     },
     {
+      "id": "277495",
+      "pid": "277495",
+      "brand": "MCM",
+      "name": "MCM Diamond",
+      "firstSeenAt": "2026-02-24T13:11:39.000Z",
+      "ratings": [
+        {
+          "rating": 5.5,
+          "date": "2026-02-24T13:11:39.000Z",
+          "commit": "716765acc094d112022b8c6372a35877e211c6df",
+          "timeRated": "14 minutes ago",
+          "commitDate": "2026-02-24T14:25:39+01:00"
+        }
+      ]
+    },
+    {
       "id": "95419",
       "pid": "95419",
       "brand": "Mercedes-Benz",
@@ -1901,6 +1988,22 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "5 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        }
+      ]
+    },
+    {
+      "id": "207615",
+      "pid": "207615",
+      "brand": "Montblanc",
+      "name": "Explorer Platinum",
+      "firstSeenAt": "2026-02-24T13:02:39.000Z",
+      "ratings": [
+        {
+          "rating": 4.5,
+          "date": "2026-02-24T13:02:39.000Z",
+          "commit": "716765acc094d112022b8c6372a35877e211c6df",
+          "timeRated": "23 minutes ago",
+          "commitDate": "2026-02-24T14:25:39+01:00"
         }
       ]
     },
@@ -2080,6 +2183,13 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "6 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        },
+        {
+          "rating": 6,
+          "date": "2026-02-24T13:09:39.000Z",
+          "commit": "716765acc094d112022b8c6372a35877e211c6df",
+          "timeRated": "16 minutes ago",
+          "commitDate": "2026-02-24T14:25:39+01:00"
         }
       ]
     },
@@ -2160,6 +2270,22 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "3 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        }
+      ]
+    },
+    {
+      "id": "241580",
+      "pid": "241580",
+      "brand": "Ralph Lauren",
+      "name": "Polo est. 67 EAU DE TOILETTE",
+      "firstSeenAt": "2026-02-24T13:09:39.000Z",
+      "ratings": [
+        {
+          "rating": 5,
+          "date": "2026-02-24T13:09:39.000Z",
+          "commit": "716765acc094d112022b8c6372a35877e211c6df",
+          "timeRated": "16 minutes ago",
+          "commitDate": "2026-02-24T14:25:39+01:00"
         }
       ]
     },
@@ -2288,6 +2414,22 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "6 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        }
+      ]
+    },
+    {
+      "id": "891",
+      "pid": "891",
+      "brand": "Sisley",
+      "name": "Eau de Campagne",
+      "firstSeenAt": "2026-02-24T13:07:39.000Z",
+      "ratings": [
+        {
+          "rating": 4.5,
+          "date": "2026-02-24T13:07:39.000Z",
+          "commit": "716765acc094d112022b8c6372a35877e211c6df",
+          "timeRated": "18 minutes ago",
+          "commitDate": "2026-02-24T14:25:39+01:00"
         }
       ]
     },
@@ -2423,6 +2565,13 @@
           "commit": "e944b74ecd2d63a4768edc03b743a585f5e3781d",
           "timeRated": "2 hours ago",
           "commitDate": "2026-02-09T18:48:13+01:00"
+        },
+        {
+          "rating": 7,
+          "date": "2026-02-23T19:25:39.000Z",
+          "commit": "716765acc094d112022b8c6372a35877e211c6df",
+          "timeRated": "18 hours ago",
+          "commitDate": "2026-02-24T14:25:39+01:00"
         }
       ]
     },
@@ -2789,6 +2938,22 @@
           "commit": "d4155c6ff73adb098b5b818b90cc53c53c2f1467",
           "timeRated": "5 days ago",
           "commitDate": "2026-02-08T19:39:23+01:00"
+        }
+      ]
+    },
+    {
+      "id": "77407",
+      "pid": "77407",
+      "brand": "Versace",
+      "name": "Versace pour Homme Dylan Blue EAU DE TOILETTE",
+      "firstSeenAt": "2026-02-24T13:10:39.000Z",
+      "ratings": [
+        {
+          "rating": 5,
+          "date": "2026-02-24T13:10:39.000Z",
+          "commit": "716765acc094d112022b8c6372a35877e211c6df",
+          "timeRated": "15 minutes ago",
+          "commitDate": "2026-02-24T14:25:39+01:00"
         }
       ]
     },
