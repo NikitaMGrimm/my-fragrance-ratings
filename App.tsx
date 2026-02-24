@@ -436,10 +436,14 @@ const App: React.FC = () => {
         </header>
 
         {!isLoading && perfumes.length > 0 && (
-          <>
-            <RatingChart perfumes={perfumes} />
-            <PriceScatterChart perfumes={perfumes} />
-          </>
+          <div className="flex flex-col lg:flex-row gap-4 mb-8">
+            <div className="w-full lg:w-1/2">
+              <RatingChart perfumes={perfumes} />
+            </div>
+            <div className="w-full lg:w-1/2">
+              <PriceScatterChart perfumes={perfumes} />
+            </div>
+          </div>
         )}
 
         <FilterBar 

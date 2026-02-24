@@ -148,7 +148,7 @@ const MissingFieldsModal: React.FC<MissingFieldsModalProps> = ({ isOpen, onClose
 
       const changes: Record<string, any> = {};
       Object.entries(perfumeOverrides).forEach(([field, value]) => {
-        const normalized = normalizeValue(field, value);
+        const normalized = normalizeValue(field, typeof value === 'string' ? value : String(value ?? ''));
         if (normalized !== undefined) {
           changes[field] = normalized;
         }

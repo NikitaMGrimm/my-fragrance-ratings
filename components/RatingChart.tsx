@@ -115,7 +115,7 @@ const RatingChart: React.FC<RatingChartProps> = ({ perfumes }) => {
   };
 
   return (
-    <div className="w-full h-[340px] bg-parfumo-card/50 border border-gray-700/50 rounded-lg p-4 mb-8 flex flex-col">
+    <div className="w-full h-[340px] bg-parfumo-card/50 border border-gray-700/50 rounded-lg p-4 flex flex-col">
       <div className="flex flex-row justify-between items-start mb-4">
         <h3 className="text-sm uppercase text-gray-500 font-bold tracking-wider shrink-0 mt-1">
           {isCumulative ? "Cumulative Distribution (≥ X)" : "Rating Distribution"}
