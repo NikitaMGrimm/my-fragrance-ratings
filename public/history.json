@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-12T22:38:45.640Z",
+  "generatedAt": "2026-04-20T16:01:21.868Z",
   "sourcePath": "public/constants.csv",
   "pageSize": 100,
   "commits": [
@@ -100,6 +100,13 @@
       "message": "Update constants.csv and images from export",
       "label": "2026-04-13 · 515e99a · Update constants.csv and images from export",
       "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/515e99acc04bb640769c704d82f869d07d9e8432/public/constants.csv"
+    },
+    {
+      "sha": "e4a92ac3e2ad64ffaab7103bb5f775cb206be586",
+      "date": "2026-04-20T18:01:10+02:00",
+      "message": "Update constants.csv and images from export",
+      "label": "2026-04-20 · e4a92ac · Update constants.csv and images from export",
+      "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/e4a92ac3e2ad64ffaab7103bb5f775cb206be586/public/constants.csv"
     }
   ],
   "fragrances": [
@@ -2126,6 +2133,13 @@
           "commit": "14d8cb8343540d551568761f375f3251504f45cc",
           "timeRated": "2 days ago",
           "commitDate": "2026-02-23T17:25:00+01:00"
+        },
+        {
+          "rating": 7.5,
+          "date": "2026-04-13T16:01:10.000Z",
+          "commit": "e4a92ac3e2ad64ffaab7103bb5f775cb206be586",
+          "timeRated": "7 days ago",
+          "commitDate": "2026-04-20T18:01:10+02:00"
         }
       ]
     },
@@ -2781,6 +2795,13 @@
           "commit": "515e99acc04bb640769c704d82f869d07d9e8432",
           "timeRated": "1 month ago",
           "commitDate": "2026-04-13T00:38:34+02:00"
+        },
+        {
+          "rating": 8.5,
+          "date": "2026-04-13T16:01:10.000Z",
+          "commit": "e4a92ac3e2ad64ffaab7103bb5f775cb206be586",
+          "timeRated": "7 days ago",
+          "commitDate": "2026-04-20T18:01:10+02:00"
         }
       ]
     },
