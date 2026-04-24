@@ -195,8 +195,14 @@ const MissingFieldsModal: React.FC<MissingFieldsModalProps> = ({ isOpen, onClose
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="bg-parfumo-card border border-gray-700 rounded-lg shadow-xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      onMouseDown={onClose}
+    >
+      <div
+        className="bg-parfumo-card border border-gray-700 rounded-lg shadow-xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         <div className="flex justify-between items-center px-6 py-4 bg-parfumo-bg border-b border-gray-700 shrink-0">
           <div>
             <h2 className="text-lg font-bold text-parfumo-text flex items-center gap-2">

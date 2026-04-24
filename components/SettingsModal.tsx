@@ -89,8 +89,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="bg-parfumo-card border border-gray-700 rounded-lg shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      onMouseDown={onClose}
+    >
+      <div
+        className="bg-parfumo-card border border-gray-700 rounded-lg shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         <div className="flex justify-between items-center px-6 py-4 bg-parfumo-bg border-b border-gray-700 shrink-0">
           <h2 className="text-lg font-bold text-parfumo-text">Settings & Import</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">

@@ -7,16 +7,19 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:history": "node scripts/build-history.cjs"
+    "build:history": "node scripts/build-history.cjs",
+    "test:ui": "playwright test",
+    "test:ui:headed": "playwright test --headed"
   },
   "dependencies": {
-    "react": "^19.2.4",
-    "lucide-react": "^0.563.0",
-    "react-dom": "^19.2.4",
     "jszip": "3.10.1",
+    "lucide-react": "^0.563.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "recharts": "2.15.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
     "typescript": "~5.8.2",

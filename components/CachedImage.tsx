@@ -9,14 +9,32 @@ interface CachedImageProps {
 }
 
 const EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
+const resolvedImageCache = new Map<string, string>();
+
+const getCacheKey = (src: string, pid?: string) => {
+  const cleanPid = String(pid || '').trim();
+  if (cleanPid && cleanPid !== '0') return `pid:${cleanPid}`;
+  return `src:${src || ''}`;
+};
 
 const CachedImage: React.FC<CachedImageProps> = ({ src, alt, pid, className }) => {
-  const [displaySrc, setDisplaySrc] = useState<string>('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const cacheKey = getCacheKey(src, pid);
+  const cachedSrc = resolvedImageCache.get(cacheKey);
+  const [displaySrc, setDisplaySrc] = useState<string>(cachedSrc || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+  const [hasLoaded, setHasLoaded] = useState(!!cachedSrc);
 
   useEffect(() => {
     let isMounted = true;
     let objectUrl: string | null = null;
+    const currentCacheKey = getCacheKey(src, pid);
+    const existing = resolvedImageCache.get(currentCacheKey);
+    if (existing) {
+      setDisplaySrc(existing);
+      setHasLoaded(true);
+      return () => {
+        isMounted = false;
+      };
+    }
 
     const loadImage = async () => {
       if (pid && pid !== '0') {
@@ -28,6 +46,7 @@ const CachedImage: React.FC<CachedImageProps> = ({ src, alt, pid, className }) =
                 const contentType = response.headers.get('content-type');
                 if (response.ok && contentType && contentType.startsWith('image')) {
                     if (isMounted) {
+                        resolvedImageCache.set(currentCacheKey, localPath);
                         setDisplaySrc(localPath);
                         setHasLoaded(true);
                     }
@@ -65,6 +84,7 @@ const CachedImage: React.FC<CachedImageProps> = ({ src, alt, pid, className }) =
         }
 
         if (isMounted) {
+            resolvedImageCache.set(currentCacheKey, src);
             setDisplaySrc(src);
             setHasLoaded(true);
         }
@@ -72,7 +92,9 @@ const CachedImage: React.FC<CachedImageProps> = ({ src, alt, pid, className }) =
       }
 
       if (isMounted) {
-         setDisplaySrc('https://picsum.photos/120/120?blur=2');
+         const fallback = 'https://picsum.photos/120/120?blur=2';
+         resolvedImageCache.set(currentCacheKey, fallback);
+         setDisplaySrc(fallback);
          setHasLoaded(true);
       }
     };
@@ -95,6 +117,7 @@ const CachedImage: React.FC<CachedImageProps> = ({ src, alt, pid, className }) =
         const target = e.target as HTMLImageElement;
         const fallback = 'https://picsum.photos/120/120?blur=2';
         if (target.src !== fallback) {
+             resolvedImageCache.set(cacheKey, fallback);
              target.src = fallback;
              target.classList.remove('opacity-0');
              target.classList.add('opacity-100');

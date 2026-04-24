@@ -116,12 +116,12 @@ const RatingChart: React.FC<RatingChartProps> = ({ perfumes }) => {
 
   return (
     <div className="w-full h-[340px] bg-parfumo-card/50 border border-gray-700/50 rounded-lg p-4 flex flex-col">
-      <div className="flex flex-row justify-between items-start mb-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-start mb-4">
         <h3 className="text-sm uppercase text-gray-500 font-bold tracking-wider shrink-0 mt-1">
           {isCumulative ? "Cumulative Distribution (≥ X)" : "Rating Distribution"}
         </h3>
 
-        <div className="flex items-center space-x-2 text-[10px] font-medium uppercase tracking-wide">
+        <div className="flex items-center space-x-2 text-[10px] font-medium uppercase tracking-wide self-end sm:self-auto">
           <span className={!isCumulative ? "text-parfumo-accent" : "text-gray-600"}>Standard</span>
           <button 
             onClick={() => setIsCumulative(!isCumulative)}
