@@ -1,27 +1,27 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { parseCSV } from './utils/csvParser';
-import { Perfume, SortOption } from './types';
+import { Perfume, RatingHistoryFile, RepoCommit, SortOption } from './types';
 import PerfumeCard from './components/PerfumeCard';
 import FilterBar from './components/FilterBar';
 import SettingsModal from './components/SettingsModal';
 import MissingFieldsModal from './components/MissingFieldsModal';
 import RatingChart from './components/RatingChart';
 import PriceScatterChart from './components/PriceScatterChart';
+import RatingHistoryPanel from './components/RatingHistoryPanel';
+import PerfumeHistoryModal from './components/PerfumeHistoryModal';
 import { loadPerfumesFromStorage, fetchDefaultCSV, savePerfumes, clearUnusedImages, clearStoredPerfumes, clearImageCache } from './utils/storage';
 import { Settings } from 'lucide-react';
 import { exportCollection } from './utils/exporter';
+import {
+  deriveRatingHistorySummary,
+  formatCommitLabel,
+  getPerfumeHistoryId,
+  normalizeRatingHistoryFile
+} from './utils/ratingHistory';
 
 type RepoInfo = {
   owner: string;
   repo: string;
-};
-
-type RepoCommit = {
-  sha: string;
-  date: string;
-  message: string;
-  label: string;
-  rawUrl?: string;
 };
 
 const HISTORY_PAGE_SIZE = 100;
@@ -47,6 +47,10 @@ const App: React.FC = () => {
   const [isRepoHistoryLoading, setIsRepoHistoryLoading] = useState(false);
   const [repoHistoryPage, setRepoHistoryPage] = useState(1);
   const [repoHistoryHasMore, setRepoHistoryHasMore] = useState(false);
+  const [ratingHistoryFile, setRatingHistoryFile] = useState<RatingHistoryFile | null>(null);
+  const [ratingHistoryError, setRatingHistoryError] = useState('');
+  const [isRatingHistoryLoading, setIsRatingHistoryLoading] = useState(false);
+  const [selectedHistoryId, setSelectedHistoryId] = useState('');
   
   const [visibleCount, setVisibleCount] = useState(50);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -64,6 +68,35 @@ const App: React.FC = () => {
       setIsLoading(false);
     };
     initData();
+  }, []);
+
+  useEffect(() => {
+    const loadRatingHistory = async () => {
+      setIsRatingHistoryLoading(true);
+      setRatingHistoryError('');
+
+      try {
+        const response = await fetch(`${import.meta.env.BASE_URL}history.json`, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(response.status === 404 ? 'history.json not found.' : `Failed to load history (${response.status})`);
+        }
+
+        const data = await response.json();
+        const normalized = normalizeRatingHistoryFile(data);
+        if (!normalized) {
+          throw new Error('history.json has no usable rating history.');
+        }
+
+        setRatingHistoryFile(normalized);
+      } catch (e: any) {
+        setRatingHistoryFile(null);
+        setRatingHistoryError(e?.message || 'Failed to load rating history.');
+      } finally {
+        setIsRatingHistoryLoading(false);
+      }
+    };
+
+    loadRatingHistory();
   }, []);
 
   useEffect(() => {
@@ -91,14 +124,6 @@ const App: React.FC = () => {
     }
 
     return null;
-  };
-
-  const formatCommitLabel = (dateIso: string, sha: string, message: string) => {
-    const date = new Date(dateIso);
-    const dateLabel = Number.isNaN(date.valueOf()) ? dateIso : date.toISOString().slice(0, 10);
-    const summary = message.split('\n')[0].trim();
-    const shortSha = sha.slice(0, 7);
-    return `${dateLabel} · ${shortSha} · ${summary}`;
   };
 
   const handleImport = (csvContent: string, overwrite: boolean) => {
@@ -184,6 +209,29 @@ const App: React.FC = () => {
       await exportCollection(perfumes);
   };
 
+  const applyRepoHistoryCommits = (commits: RepoCommit[]) => {
+    const normalized = commits
+      .map((entry: RepoCommit) => {
+        const date = entry?.date || '';
+        const message = entry?.message || '';
+        const sha = entry?.sha || '';
+        const label = entry?.label || formatCommitLabel(date, sha, message);
+        const rawUrl = entry?.rawUrl || '';
+        return { sha, date, message, label, rawUrl } as RepoCommit;
+      })
+      .filter((commit: RepoCommit) => commit.sha && commit.date);
+
+    if (normalized.length === 0) {
+      throw new Error('No commits found in history.json.');
+    }
+
+    setRepoHistoryAll(normalized);
+    const initial = normalized.slice(0, HISTORY_PAGE_SIZE);
+    setRepoHistory(initial);
+    setRepoHistoryHasMore(normalized.length > initial.length);
+    setRepoHistoryPage(1);
+  };
+
   const handleLoadRepoHistory = async () => {
     setRepoHistoryError('');
     setIsRepoHistoryLoading(true);
@@ -191,6 +239,11 @@ const App: React.FC = () => {
     setRepoHistoryPage(1);
 
     try {
+      if (ratingHistoryFile) {
+        applyRepoHistoryCommits(ratingHistoryFile.commits);
+        return;
+      }
+
       const response = await fetch(`${import.meta.env.BASE_URL}history.json`, { cache: 'no-store' });
       if (!response.ok) {
         if (response.status === 404) {
@@ -200,25 +253,14 @@ const App: React.FC = () => {
       }
 
       const data = await response.json();
-      const commits = Array.isArray(data?.commits) ? data.commits : [];
-      if (!Array.isArray(commits) || commits.length === 0) {
+      const normalizedHistory = normalizeRatingHistoryFile(data);
+      if (!normalizedHistory) {
         throw new Error('No commits found in history.json.');
       }
 
-      const normalized = commits.map((entry: any) => {
-        const date = entry?.date || '';
-        const message = entry?.message || '';
-        const sha = entry?.sha || '';
-        const label = entry?.label || formatCommitLabel(date, sha, message);
-        const rawUrl = entry?.rawUrl || '';
-        return { sha, date, message, label, rawUrl } as RepoCommit;
-      }).filter((commit: RepoCommit) => commit.sha && commit.date);
-
-      setRepoHistoryAll(normalized);
-      const initial = normalized.slice(0, HISTORY_PAGE_SIZE);
-      setRepoHistory(initial);
-      setRepoHistoryHasMore(normalized.length > initial.length);
-      setRepoHistoryPage(1);
+      setRatingHistoryFile(normalizedHistory);
+      setRatingHistoryError('');
+      applyRepoHistoryCommits(normalizedHistory.commits);
     } catch (e: any) {
       setRepoHistoryAll([]);
       setRepoHistory([]);
@@ -270,6 +312,20 @@ const App: React.FC = () => {
     setPerfumes(updated);
     savePerfumes(updated);
   };
+
+  const ratingHistorySummary = useMemo(() => {
+    return deriveRatingHistorySummary(ratingHistoryFile, perfumes);
+  }, [ratingHistoryFile, perfumes]);
+
+  const selectedHistory = useMemo(() => {
+    if (!selectedHistoryId || !ratingHistorySummary) return null;
+    return ratingHistorySummary.byId.get(selectedHistoryId) || null;
+  }, [selectedHistoryId, ratingHistorySummary]);
+
+  const selectedHistoryPerfume = useMemo(() => {
+    if (!selectedHistoryId) return null;
+    return perfumes.find((perfume) => getPerfumeHistoryId(perfume) === selectedHistoryId) || null;
+  }, [perfumes, selectedHistoryId]);
 
   const segmentFieldKey = useMemo(() => {
     const allKeys = new Set<string>();
@@ -436,14 +492,21 @@ const App: React.FC = () => {
         </header>
 
         {!isLoading && perfumes.length > 0 && (
-          <div className="flex flex-col lg:flex-row gap-4 mb-8">
-            <div className="w-full lg:w-1/2">
-              <RatingChart perfumes={perfumes} />
+          <>
+            <RatingHistoryPanel
+              summary={ratingHistorySummary}
+              isLoading={isRatingHistoryLoading}
+              error={ratingHistoryError}
+            />
+            <div className="flex flex-col lg:flex-row gap-4 mb-8">
+              <div className="w-full lg:w-1/2">
+                <RatingChart perfumes={perfumes} />
+              </div>
+              <div className="w-full lg:w-1/2">
+                <PriceScatterChart perfumes={perfumes} />
+              </div>
             </div>
-            <div className="w-full lg:w-1/2">
-              <PriceScatterChart perfumes={perfumes} />
-            </div>
-          </div>
+          </>
         )}
 
         <FilterBar 
@@ -476,7 +539,12 @@ const App: React.FC = () => {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
               {visiblePerfumes.map((perfume) => (
-                  <PerfumeCard key={perfume.pid || `${perfume.brand}-${perfume.name}`} perfume={perfume} />
+                  <PerfumeCard
+                    key={perfume.pid || `${perfume.brand}-${perfume.name}`}
+                    perfume={perfume}
+                    history={ratingHistorySummary?.byId.get(getPerfumeHistoryId(perfume))}
+                    onHistoryClick={(history) => setSelectedHistoryId(history.id)}
+                  />
               ))}
               </div>
 
@@ -516,6 +584,12 @@ const App: React.FC = () => {
           onClose={() => setIsMissingFieldsOpen(false)}
           perfumes={perfumes}
           onSave={handleMissingFieldsSave}
+        />
+
+        <PerfumeHistoryModal
+          perfume={selectedHistoryPerfume}
+          history={selectedHistory}
+          onClose={() => setSelectedHistoryId('')}
         />
       </div>
     </div>
