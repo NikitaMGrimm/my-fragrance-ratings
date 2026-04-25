@@ -29,6 +29,19 @@ test('history dashboard and modal render cleanly', async ({ page }, testInfo) =>
   await expect(page.locator('h2', { hasText: 'Rating History' })).toBeHidden();
 });
 
+test('history modal reflects current collection ratings when generated history is stale', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByPlaceholder('Search your collection...').fill('Naxos');
+  const historyButton = page.getByRole('button', { name: 'Open rating history for Xerjoff Naxos' });
+  await expect(historyButton).toBeVisible();
+  await historyButton.click();
+
+  await expect(page.locator('h2', { hasText: 'Rating History' })).toBeVisible();
+  await expect(page.getByTestId('history-latest-rating')).toHaveText('8.0');
+  await expect(page.getByTestId('history-entry-local-current')).toContainText('8.0');
+});
+
 test('top modals close when clicking outside', async ({ page }) => {
   await page.goto('/');
 

@@ -10,6 +10,8 @@ import {
 } from '../types';
 
 const HISTORY_SOURCE_PATH = 'public/constants.csv';
+const LOCAL_CURRENT_COMMIT = 'local-current';
+const RATING_CHANGE_EPSILON = 0.001;
 
 export const getPerfumeHistoryId = (perfume: Pick<Perfume, 'pid' | 'brand' | 'name'>) => {
   const pid = String(perfume.pid || '').trim();
@@ -108,6 +110,103 @@ const sortByDate = <T extends { date: string }>(items: T[]) => {
   });
 };
 
+const latestIsoDate = (dates: string[]) => {
+  const latest = dates.reduce((max, value) => {
+    const time = new Date(value).valueOf();
+    return Number.isNaN(time) ? max : Math.max(max, time);
+  }, 0);
+
+  return latest > 0 ? new Date(latest).toISOString() : '';
+};
+
+const getLocalSnapshotDate = (history: RatingHistoryFile) => {
+  const latestHistoricalDate = latestIsoDate([
+    ...history.commits.map((commit) => commit.date),
+    ...history.fragrances.flatMap((fragrance) => fragrance.ratings.map((point) => point.date))
+  ]);
+  const latestHistoricalTime = latestHistoricalDate ? new Date(latestHistoricalDate).valueOf() : 0;
+  const snapshotTime = Math.max(Date.now(), latestHistoricalTime + 1);
+
+  return new Date(snapshotTime).toISOString();
+};
+
+const applyCurrentRatings = (history: RatingHistoryFile, perfumes: Perfume[]): RatingHistoryFile => {
+  if (perfumes.length === 0) return history;
+
+  const currentById = new Map<string, Perfume>();
+  perfumes.forEach((perfume) => {
+    const id = getPerfumeHistoryId(perfume);
+    if (id) currentById.set(id, perfume);
+  });
+
+  if (currentById.size === 0) return history;
+
+  const snapshotDate = getLocalSnapshotDate(history);
+  let hasLocalChanges = false;
+
+  const fragrances = history.fragrances.map((fragrance) => {
+    const current = currentById.get(fragrance.id);
+    const currentRating = Number(current?.rating);
+
+    if (!current || !Number.isFinite(currentRating)) {
+      return fragrance;
+    }
+
+    const historicalRatings = sortByDate(fragrance.ratings)
+      .filter((point) => point.commit !== LOCAL_CURRENT_COMMIT);
+    const latest = historicalRatings[historicalRatings.length - 1];
+
+    if (latest && Math.abs(latest.rating - currentRating) < RATING_CHANGE_EPSILON) {
+      return {
+        ...fragrance,
+        ratings: historicalRatings
+      };
+    }
+
+    hasLocalChanges = true;
+
+    return {
+      ...fragrance,
+      pid: String(current.pid || fragrance.pid || ''),
+      brand: current.brand || fragrance.brand,
+      name: current.name || fragrance.name,
+      ratings: [
+        ...historicalRatings,
+        {
+          rating: currentRating,
+          date: snapshotDate,
+          commit: LOCAL_CURRENT_COMMIT,
+          timeRated: String(current.timeRated || 'Current collection'),
+          commitDate: snapshotDate
+        }
+      ]
+    };
+  });
+
+  if (!hasLocalChanges) {
+    return history;
+  }
+
+  const commits = history.commits.some((commit) => commit.sha === LOCAL_CURRENT_COMMIT)
+    ? history.commits
+    : [
+        ...history.commits,
+        {
+          sha: LOCAL_CURRENT_COMMIT,
+          date: snapshotDate,
+          message: 'Current collection',
+          label: 'Current collection',
+          rawUrl: ''
+        }
+      ];
+
+  return {
+    ...history,
+    commits,
+    fragrances
+  };
+};
+
 const buildSummary = (fragrance: FragranceRatingHistory): FragranceRatingSummary => {
   const ratings = sortByDate(fragrance.ratings);
   const first = ratings[0];
@@ -184,8 +283,9 @@ export const deriveRatingHistorySummary = (
 ): RatingHistorySummary | null => {
   if (!history) return null;
 
+  const effectiveHistory = applyCurrentRatings(history, perfumes);
   const currentIds = new Set(perfumes.map(getPerfumeHistoryId));
-  const summaries = history.fragrances
+  const summaries = effectiveHistory.fragrances
     .filter((fragrance) => currentIds.size === 0 || currentIds.has(fragrance.id))
     .map(buildSummary);
 
@@ -215,7 +315,7 @@ export const deriveRatingHistorySummary = (
     changedCount: movers.length,
     averageDelta,
     biggestMover: movers[0] || null,
-    timeline: deriveTimeline(history, currentIds),
+    timeline: deriveTimeline(effectiveHistory, currentIds),
     movers,
     recentChanges,
     byId

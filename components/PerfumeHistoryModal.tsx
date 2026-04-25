@@ -130,7 +130,7 @@ const PerfumeHistoryModal: React.FC<PerfumeHistoryModalProps> = ({ perfume, hist
                   <div className="uppercase tracking-wider text-gray-500">First</div>
                 </div>
                 <div>
-                  <div className="font-bold text-parfumo-text">{history.latestRating.toFixed(1)}</div>
+                  <div data-testid="history-latest-rating" className="font-bold text-parfumo-text">{history.latestRating.toFixed(1)}</div>
                   <div className="uppercase tracking-wider text-gray-500">Latest</div>
                 </div>
                 <div>
@@ -145,7 +145,11 @@ const PerfumeHistoryModal: React.FC<PerfumeHistoryModalProps> = ({ perfume, hist
 
           <div className="mt-5 rounded border border-gray-700/50 bg-black/10">
             {history.ratings.map((point, index) => (
-              <div key={`${point.commit}-${index}`} className="flex items-center justify-between gap-3 border-b border-gray-800/80 px-3 py-3 last:border-0">
+              <div
+                key={`${point.commit}-${index}`}
+                data-testid={`history-entry-${point.commit}`}
+                className="flex items-center justify-between gap-3 border-b border-gray-800/80 px-3 py-3 last:border-0"
+              >
                 <div className="min-w-0">
                   <div className="text-sm font-medium text-parfumo-text">{formatDate(point.date)}</div>
                   <div className="truncate text-[11px] text-gray-500">
