@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-25T20:49:08.454Z",
+  "generatedAt": "2026-04-25T20:54:40.542Z",
   "sourcePath": "public/constants.csv",
   "pageSize": 100,
   "commits": [
@@ -128,6 +128,13 @@
       "message": "Update constants.csv and images from export",
       "label": "2026-04-25 · 88c5515 · Update constants.csv and images from export",
       "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/88c5515829f2b6631633a5f05d62e2011df4ed30/public/constants.csv"
+    },
+    {
+      "sha": "3a8f47068e75b6930096ae4cd678366115f4afc8",
+      "date": "2026-04-25T22:54:30+02:00",
+      "message": "Update constants.csv and images from export",
+      "label": "2026-04-25 · 3a8f470 · Update constants.csv and images from export",
+      "rawUrl": "https://raw.githubusercontent.com/NikitaMGrimm/my-fragrance-ratings/3a8f47068e75b6930096ae4cd678366115f4afc8/public/constants.csv"
     }
   ],
   "fragrances": [
@@ -632,6 +639,13 @@
           "commit": "88c5515829f2b6631633a5f05d62e2011df4ed30",
           "timeRated": "1 hour ago",
           "commitDate": "2026-04-25T19:21:23+02:00"
+        },
+        {
+          "rating": 5.5,
+          "date": "2026-04-25T18:54:30.000Z",
+          "commit": "3a8f47068e75b6930096ae4cd678366115f4afc8",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-04-25T22:54:30+02:00"
         }
       ]
     },
@@ -1314,6 +1328,13 @@
           "commit": "88c5515829f2b6631633a5f05d62e2011df4ed30",
           "timeRated": "Just now",
           "commitDate": "2026-04-25T19:21:23+02:00"
+        },
+        {
+          "rating": 7.5,
+          "date": "2026-04-25T18:54:30.000Z",
+          "commit": "3a8f47068e75b6930096ae4cd678366115f4afc8",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-04-25T22:54:30+02:00"
         }
       ]
     },
@@ -1330,6 +1351,13 @@
           "commit": "88c5515829f2b6631633a5f05d62e2011df4ed30",
           "timeRated": "1 hour ago",
           "commitDate": "2026-04-25T19:21:23+02:00"
+        },
+        {
+          "rating": 5,
+          "date": "2026-04-25T18:54:30.000Z",
+          "commit": "3a8f47068e75b6930096ae4cd678366115f4afc8",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-04-25T22:54:30+02:00"
         }
       ]
     },
@@ -3211,6 +3239,13 @@
           "commit": "88c5515829f2b6631633a5f05d62e2011df4ed30",
           "timeRated": "Just now",
           "commitDate": "2026-04-25T19:21:23+02:00"
+        },
+        {
+          "rating": 8.5,
+          "date": "2026-04-25T18:54:30.000Z",
+          "commit": "3a8f47068e75b6930096ae4cd678366115f4afc8",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-04-25T22:54:30+02:00"
         }
       ]
     },
@@ -4079,6 +4114,13 @@
           "commit": "88c5515829f2b6631633a5f05d62e2011df4ed30",
           "timeRated": "Just now",
           "commitDate": "2026-04-25T19:21:23+02:00"
+        },
+        {
+          "rating": 8.5,
+          "date": "2026-04-25T18:54:30.000Z",
+          "commit": "3a8f47068e75b6930096ae4cd678366115f4afc8",
+          "timeRated": "2 hours ago",
+          "commitDate": "2026-04-25T22:54:30+02:00"
         }
       ]
     },
