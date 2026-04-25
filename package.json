@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "build:history": "node scripts/build-history.cjs",
+    "publish:export": "bash scripts/local-import-export.sh",
     "test:ui": "playwright test",
     "test:ui:headed": "playwright test --headed"
   },
