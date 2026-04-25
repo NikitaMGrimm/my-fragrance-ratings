@@ -1,5 +1,59 @@
 import { expect, test } from '@playwright/test';
 
+const csvWithTwoPerfumes = [
+  'Brand,Name,PID,Image URL,Page URL,Time Rated,Rating,Price,Market Segment',
+  'Xerjoff,Naxos,58692,https://example.com/naxos.jpg,https://example.com/naxos,Just now,8,134,Niche',
+  'Alezz,Lahab,363499,https://example.com/lahab.jpg,https://example.com/lahab,1 hour ago,5.5,85,Dupe'
+].join('\n');
+
+const storedNaxos = [{
+  brand: 'Xerjoff',
+  name: 'Naxos',
+  pid: '58692',
+  imageUrl: 'https://example.com/old-naxos.jpg',
+  pageUrl: 'https://example.com/naxos',
+  timeRated: '1 month ago',
+  rating: 7,
+  price: 134,
+  'Market Segment': 'Niche'
+}];
+
+test('default cached collection refreshes from the latest CSV', async ({ page }) => {
+  await page.route('**/constants.csv', async (route) => {
+    await route.fulfill({ contentType: 'text/csv', body: csvWithTwoPerfumes });
+  });
+  await page.addInitScript((perfumes) => {
+    localStorage.setItem('my_perfume_collection', JSON.stringify(perfumes));
+  }, storedNaxos);
+
+  await page.goto('/');
+
+  await expect(page.getByText('Displaying 2 of 2 perfumes')).toBeVisible();
+  const stored = await page.evaluate(() => ({
+    perfumes: JSON.parse(localStorage.getItem('my_perfume_collection') || '[]'),
+    meta: JSON.parse(localStorage.getItem('my_perfume_collection_meta') || '{}')
+  }));
+  expect(stored.perfumes).toHaveLength(2);
+  expect(stored.meta.mode).toBe('default');
+});
+
+test('custom collection does not get overwritten by the default CSV', async ({ page }) => {
+  await page.route('**/constants.csv', async (route) => {
+    await route.fulfill({ contentType: 'text/csv', body: csvWithTwoPerfumes });
+  });
+  await page.addInitScript((perfumes) => {
+    localStorage.setItem('my_perfume_collection', JSON.stringify(perfumes));
+    localStorage.setItem('my_perfume_collection_meta', JSON.stringify({ mode: 'custom' }));
+  }, storedNaxos);
+
+  await page.goto('/');
+
+  await expect(page.getByText('Displaying 1 of 1 perfumes')).toBeVisible();
+  await expect(page.getByText('Lahab')).toBeHidden();
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('my_perfume_collection_meta') || '{}'));
+  expect(stored.mode).toBe('custom');
+});
+
 test('history dashboard and modal render cleanly', async ({ page }, testInfo) => {
   await page.goto('/');
 

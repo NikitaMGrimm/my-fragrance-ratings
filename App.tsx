@@ -9,7 +9,7 @@ import RatingChart from './components/RatingChart';
 import PriceScatterChart from './components/PriceScatterChart';
 import RatingHistoryPanel from './components/RatingHistoryPanel';
 import PerfumeHistoryModal from './components/PerfumeHistoryModal';
-import { loadPerfumesFromStorage, fetchDefaultCSV, savePerfumes, clearUnusedImages, clearStoredPerfumes, clearImageCache } from './utils/storage';
+import { loadPerfumesFromStorage, fetchDefaultCSV, savePerfumes, saveDefaultPerfumes, clearUnusedImages, clearStoredPerfumes, clearImageCache } from './utils/storage';
 import { Settings } from 'lucide-react';
 import { exportCollection } from './utils/exporter';
 import {
@@ -58,11 +58,16 @@ const App: React.FC = () => {
   useEffect(() => {
     const initData = async () => {
       setIsLoading(true);
-      const stored = loadPerfumesFromStorage();
-      if (stored && stored.length > 0) {
-        setPerfumes(stored);
+      const defaultData = await fetchDefaultCSV();
+      const stored = loadPerfumesFromStorage(defaultData);
+      const shouldUseDefault = defaultData.length > 0 && (!stored || stored.mode === 'default' || stored.mode === 'legacy-default');
+
+      if (shouldUseDefault) {
+        setPerfumes(defaultData);
+        saveDefaultPerfumes(defaultData);
+      } else if (stored && stored.perfumes.length > 0) {
+        setPerfumes(stored.perfumes);
       } else {
-        const defaultData = await fetchDefaultCSV();
         setPerfumes(defaultData);
       }
       setIsLoading(false);
@@ -200,6 +205,7 @@ const App: React.FC = () => {
     }
 
     const defaultData = await fetchDefaultCSV();
+    saveDefaultPerfumes(defaultData);
     setPerfumes(defaultData);
     setIsLoading(false);
     alert("Storage reset to the default collection.");

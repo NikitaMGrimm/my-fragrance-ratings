@@ -2,15 +2,75 @@ import { Perfume } from '../types';
 import { parseCSV } from './csvParser';
 
 const STORAGE_KEY = 'my_perfume_collection';
+const STORAGE_META_KEY = 'my_perfume_collection_meta';
 const DB_NAME = 'PerfumeCacheDB';
 const STORE_NAME = 'images';
 const DB_VERSION = 1;
 
-export const loadPerfumesFromStorage = (): Perfume[] | null => {
+type CollectionMode = 'default' | 'custom' | 'legacy-default' | 'legacy-custom';
+
+type CollectionMeta = {
+  mode?: 'default' | 'custom';
+  savedAt?: string;
+};
+
+export type StoredPerfumeCollection = {
+  perfumes: Perfume[];
+  mode: CollectionMode;
+};
+
+const getPerfumeId = (perfume: Pick<Perfume, 'pid' | 'brand' | 'name'>) => {
+  const pid = String(perfume.pid || '').trim();
+  if (pid && pid !== '0') return pid;
+  return `${perfume.brand || ''}|${perfume.name || ''}`;
+};
+
+const loadCollectionMeta = (): CollectionMeta | null => {
+  try {
+    const stored = localStorage.getItem(STORAGE_META_KEY);
+    if (!stored) return null;
+    return JSON.parse(stored);
+  } catch (e) {
+    console.error("Failed to load collection metadata", e);
+    return null;
+  }
+};
+
+const saveCollectionMeta = (mode: 'default' | 'custom') => {
+  try {
+    localStorage.setItem(STORAGE_META_KEY, JSON.stringify({
+      mode,
+      savedAt: new Date().toISOString()
+    }));
+  } catch (e) {
+    console.error("Failed to save collection metadata", e);
+  }
+};
+
+const matchesDefaultPrefix = (stored: Perfume[], defaultPerfumes: Perfume[]) => {
+  if (stored.length === 0 || defaultPerfumes.length === 0 || stored.length > defaultPerfumes.length) {
+    return false;
+  }
+
+  return stored.every((perfume, index) => getPerfumeId(perfume) === getPerfumeId(defaultPerfumes[index]));
+};
+
+export const loadPerfumesFromStorage = (defaultPerfumes: Perfume[] = []): StoredPerfumeCollection | null => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      return JSON.parse(stored);
+      const perfumes = JSON.parse(stored);
+      if (!Array.isArray(perfumes)) return null;
+
+      const meta = loadCollectionMeta();
+      if (meta?.mode === 'custom' || meta?.mode === 'default') {
+        return { perfumes, mode: meta.mode };
+      }
+
+      return {
+        perfumes,
+        mode: matchesDefaultPrefix(perfumes, defaultPerfumes) ? 'legacy-default' : 'legacy-custom'
+      };
     }
   } catch (e) {
     console.error("Failed to load from local storage", e);
@@ -25,26 +85,30 @@ export const fetchDefaultCSV = async (): Promise<Perfume[]> => {
         throw new Error("CSV file not found");
     }
     const csvText = await response.text();
-    const data = parseCSV(csvText);
-    savePerfumes(data);
-    return data;
+    return parseCSV(csvText);
   } catch (e) {
     console.warn("Could not load constants.csv", e);
     return [];
   }
 };
 
-export const savePerfumes = (perfumes: Perfume[]) => {
+const savePerfumesWithMode = (perfumes: Perfume[], mode: 'default' | 'custom') => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(perfumes));
+    saveCollectionMeta(mode);
   } catch (e) {
     console.error("Failed to save to local storage", e);
   }
 };
 
+export const savePerfumes = (perfumes: Perfume[]) => savePerfumesWithMode(perfumes, 'custom');
+
+export const saveDefaultPerfumes = (perfumes: Perfume[]) => savePerfumesWithMode(perfumes, 'default');
+
 export const clearStoredPerfumes = () => {
   try {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_META_KEY);
   } catch (e) {
     console.error("Failed to clear local storage", e);
   }
