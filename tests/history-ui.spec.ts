@@ -30,6 +30,44 @@ test('history dashboard and modal render cleanly', async ({ page }, testInfo) =>
 });
 
 test('history modal reflects current collection ratings when generated history is stale', async ({ page }) => {
+  await page.route('**/history.json', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        generatedAt: '2026-01-01T00:00:00.000Z',
+        sourcePath: 'public/constants.csv',
+        pageSize: 100,
+        commits: [
+          {
+            sha: 'stale-history',
+            date: '2026-01-01T00:00:00.000Z',
+            message: 'Stale history',
+            label: 'Stale history',
+            rawUrl: ''
+          }
+        ],
+        fragrances: [
+          {
+            id: '58692',
+            pid: '58692',
+            brand: 'Xerjoff',
+            name: 'Naxos',
+            firstSeenAt: '2026-01-01T00:00:00.000Z',
+            ratings: [
+              {
+                rating: 7,
+                date: '2026-01-01T00:00:00.000Z',
+                commit: 'stale-history',
+                timeRated: 'Stale',
+                commitDate: '2026-01-01T00:00:00.000Z'
+              }
+            ]
+          }
+        ]
+      })
+    });
+  });
+
   await page.goto('/');
 
   await page.getByPlaceholder('Search your collection...').fill('Naxos');
